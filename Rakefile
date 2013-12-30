@@ -1,5 +1,11 @@
-require 'rake'
+require 'rubygems'
+require 'bundler/setup'
 
-require 'rspec/core/rake_task'
+Bundler.require :default
+
 require 'puppetlabs_spec_helper/rake_tasks'
+require 'puppet-lint/tasks/puppet-lint'
 
+task :default do
+  sh %{rake -T}
+end

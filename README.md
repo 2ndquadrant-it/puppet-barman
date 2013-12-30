@@ -11,7 +11,7 @@ For further information on barman:
 
 ## Installation
 
-The module can be installed automatically with the *puppet* command on the master, or manually by cloning the 
+The module can be installed automatically with the *puppet* command on the master, or manually by cloning the
 repository in your puppet module path.
 
 ### Installing via puppet
@@ -25,9 +25,7 @@ This will take care of the dependencies as well.
 
 ### Installing manually
 
-If you choose to install manually, you will have to clone the repository in the module path and handle dependencies manually.
-
-The dependencies that need to be installed are **stdlib** and **apt** from puppetlabs.
+If you choose to install manually, you will have to clone the repository in the module path.
 
 ## Usage
 
@@ -37,9 +35,22 @@ The barman class installs barman. Currently only Ubuntu and Debian are supported
 
 Intensive testing has only been done on Ubuntu 12.04 LTS.
 
-In order to install Barman with the defaults option, it is sufficient to just include the 
+In order to install Barman with the defaults option, it is sufficient to just include the
 barman class:
 
+    class { 'barman': }
+
+The package of latest version of barman is always available in PGDG
+[apt](http://apt.postgresql.org/) and
+[yum](http://yum.postgresql.org/) repository.
+If you want to setup it for your installation the easiest way is to
+use the
+[postgresql](https://github.com/puppetlabs/puppetlabs-postgresql)
+module.
+
+    class { 'postgresql::globals':
+      manage_package_repo => true,
+    }->
     class { 'barman': }
 
 All the configuration options that barman accepts can be overridden from the package defaults.
