@@ -1,0 +1,29 @@
+# Ruby
+.rvmrc
+.rbenv-version
+.rbenv-gemsets
+
+# Bundler
+.bundle/
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# SublimeText
+*.sublime-workspace
+
+# Vim
+.*.s[a-w][a-z]
+
+# OS X
+.DS_Store
+Icon
+._*
+
+# This is a library, so don't pin
+Gemfile.lock
+
+# rspec
+spec/fixtures
