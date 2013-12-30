@@ -62,7 +62,8 @@ class barman (
 ) {
 
   package { 'barman':
-    ensure  => latest
+    ensure  => latest,
+    tag     => 'postgresql',
   }
 
   file { '/etc/barman.conf.d':

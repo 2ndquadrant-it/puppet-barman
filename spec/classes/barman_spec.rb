@@ -8,7 +8,7 @@ describe 'barman' do
   } }
 
   # Installs barman
-  it { should contain_package('barman') }
+  it { should contain_package('barman').with_tag('postgresql') }
 
   # Creates the configurations
   it { should contain_file('/etc/barman.conf.d') }
