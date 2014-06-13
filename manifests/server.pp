@@ -21,12 +21,12 @@
 # === Examples
 #
 #  barman::server { 'main':
-#    conninfo    => 'user=postgres host=server1 password=pg123',
-#    ssh_command => 'ssh postgres@server1',
-#    compression => 'bzip2',
-#    pre_backup_script = '/usr/bin/touch /tmp/started',
-#    post_backup_script = '/usr/bin/touch /tmp/stopped',
-#    custom_lines = '; something'
+#    conninfo           => 'user=postgres host=server1 password=pg123',
+#    ssh_command        => 'ssh postgres@server1',
+#    compression        => 'bzip2',
+#    pre_backup_script  => '/usr/bin/touch /tmp/started',
+#    post_backup_script => '/usr/bin/touch /tmp/stopped',
+#    custom_lines       => '; something'
 #  }
 # ---
 #
@@ -38,25 +38,30 @@
 #
 # Copyright 2012 Devise.IT SRL
 #
-
 define barman::server (
   $conninfo,
   $ssh_command,
-  $description = $name,
-  $compression = false,
-  $pre_backup_script = false,
+  $ensure             = 'present',
+  $conf_template      = 'barman/server.conf',
+  $description        = $name,
+  $compression        = false,
+  $pre_backup_script  = false,
   $post_backup_script = false,
-  $custom_lines = '',
+  $custom_lines       = '',
 ) {
 
+  validate_re($ensure, '^(present|absent)$', "${ensure} is not a valid value (ensure = present|absent).")
   validate_re($name, '^[0-9a-z/]*$', "${name} is not a valid name. Please only use lowercase letters, numbers and slashes.")
+  if $custom_lines != '' {
+    notice "The 'custom_lines' option is deprecated. Please use \$conf_template for custom configuration"
+  }
 
   file { "/etc/barman.conf.d/${name}.conf":
-    ensure  => present,
+    ensure  => $ensure,
     mode    => '0640',
     owner   => 'root',
-    group   => 'barman',
-    content => template('barman/server.conf')
+    group   => $barman::group,
+    content => $conf_template
   }
 
   exec { "barman-check-${name}":
