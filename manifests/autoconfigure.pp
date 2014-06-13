@@ -1,32 +1,19 @@
 class barman::autoconfigure (
-  $host_group = 'global',
+  $host_group     = $::barman::settings::host_group,
 ) {
 
-  file { '/var/lib/barman/.pgpass':
+  file { "${::barman::settings::home}/.pgpass":
     ensure  => 'file',
-    owner   => 'barman',
-    group   => 'barman',
+    owner   => $::barman::settings::user,
+    group   => $::barman::settings::group,
     mode    => '0600',
     require => Class['barman'],
   }
 
-  # TODO: host specific password
-  file_line { 'barman_pgpass_content':
-    path   => '/var/lib/barman/.pgpass',
-    line   => "*:*:*:barman-${::hostname}:${password}",
-  }
-
-  File_line <<| tag == "barman_pgpass_${host_group} |>>
-
-  # export the archive command for target server usage
-  @@barman_host::archive_command { $::fqdn:
-    barman_home => $home,
-    tag         => "barman-${host_group}",
-  }
-
-  # import resources from postgres servers
-  Barman_host::Server_config <<| tag == "barman-${host_group}" |>> {
-    barman_user => "barman-${::hostname}",
+  # Import Resources exported by Postgres Servers
+  File_line <<| tag == "barman_pgpass_${host_group}" |>>
+  Barman::Server <<| tag == "barman-${host_group}" |>> {
+    barman_user => $::barman::settings::dbuser,
     require     => Class['barman'],
   }
   Cron <<| tag == "barman-${host_group}" |>> {
@@ -36,10 +23,14 @@ class barman::autoconfigure (
     require => Class['barman'],
   }
 
-  # export barman ssh key (avoid errors at first run)
+  # Export resources to Postgres Servers
+  @@barman::archive_command { $barman::barman_ipaddress:
+    tag                 => "barman-${host_group}",
+  }
+
   if ($::barman_key != undef and $::barman_key != '') {
     $barman_key_splitted = split($::barman_key, ' ')
-    @@ssh_authorized_key { "barman-${::hostname}":
+    @@ssh_authorized_key { $barman::settings::user:
       ensure  => present,
       user    => 'postgres',
       type    => $barman_key_splitted[0],
@@ -51,18 +42,11 @@ class barman::autoconfigure (
   @@postgresql::server::pg_hba_rule { "barman ${::hostname} client access":
     description => "barman ${::hostname} client access",
     type        => 'host',
-    database    => 'postgres',
-    user        => "barman-${::hostname}",
-    address     => "${base_host::internal_ipaddress}/32",
+    database    => $barman::settings::dbname,
+    user        => $barman::settings::dbuser,
+    address     => "${barman::barman_ipaddress}/32",
     auth_method => 'md5',
     tag         => "barman-${host_group}",
-  }
-
-  @@postgresql::server::role { "barman-${::hostname}":
-    login         => true,
-    password_hash => postgresql_password("barman-${::hostname}", $password),
-    superuser     => true,
-    tag           => "barman-${host_group}",
   }
 
 }

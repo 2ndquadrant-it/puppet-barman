@@ -61,7 +61,7 @@ define barman::server (
     mode    => '0640',
     owner   => 'root',
     group   => $barman::group,
-    content => $conf_template
+    content => template($conf_template),
   }
 
   exec { "barman-check-${name}":

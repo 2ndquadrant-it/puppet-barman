@@ -62,19 +62,20 @@
 # Copyright 2012-2014 2ndQuadrant Italia (Devise.IT SRL)
 #
 class barman (
-  $user               = 'barman',
-  $group              = 'barman',
+  $user               = $barman::settings::user,
+  $group              = $barman::settings::group,
   $ensure             = 'present',
   $conf_template      = 'barman/barman.conf',
   $logrotate_template = 'barman/logrotate.conf',
-  $home               = '/var/lib/barman',
+  $home               = $barman::settings::home,
   $logfile            = '/var/log/barman/barman.log',
   $compression        = 'gzip',
   $pre_backup_script  = false,
   $post_backup_script = false,
   $custom_lines       = '',
-  $autoconfigure      = false,
-) {
+  $barman_ipaddress   = $::ipaddress,
+  $autoconfigure      = $barman::settings::autoconfigure,
+) inherits barman::settings {
 
   validate_bool($autoconfigure)
 
