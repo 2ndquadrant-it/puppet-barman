@@ -1,6 +1,6 @@
 # == Class: barman
 #
-# This class installs BaRMan.
+# This class installs Barman (Backup and recovery manager for Postgres).
 #
 # === Parameters
 #
@@ -26,7 +26,7 @@
 #
 # === Examples
 #
-# The class can be used right away with the defaults:
+# The class can be used right away with defaults:
 # ---
 #  include barman
 # ---
@@ -37,9 +37,9 @@
 #    home     => '/srv/barman',
 #    logfile  => '/var/log/barman/something_else.log',
 #    compression => 'bzip2',
-#    pre_backup_script = '/usr/bin/touch /tmp/started',
-#    post_backup_script = '/usr/bin/touch /tmp/stopped',
-#    custom_lines = '; something'
+#    pre_backup_script => '/usr/bin/touch /tmp/started',
+#    post_backup_script => '/usr/bin/touch /tmp/stopped',
+#    custom_lines => '; something'
 #  }
 # ---
 #
@@ -51,42 +51,56 @@
 #
 # Copyright 2012 Devise.IT SRL
 #
-
 class barman (
-  $home = '/var/lib/barman',
-  $logfile = '/var/log/barman/barman.log',
-  $compression = 'gzip',
-  $pre_backup_script = false,
+  $user               = 'barman',
+  $group              = 'barman',
+  $ensure             = 'present',
+  $conf_template      = 'barman/barman.conf',
+  $logrotate_template = 'barman/logrotate.conf',
+  $home               = '/var/lib/barman',
+  $logfile            = '/var/log/barman/barman.log',
+  $compression        = 'gzip',
+  $pre_backup_script  = false,
   $post_backup_script = false,
-  $custom_lines = ''
+  $custom_lines       = '',
 ) {
 
+  $ensure_file = $ensure ? {
+    'absent' => 'absent',
+    default  => 'present',
+  }
+
+  $ensure_directory = $ensure ? {
+    'absent' => 'absent',
+    default  => 'directory',
+  }
+
   package { 'barman':
-    ensure  => latest,
+    ensure  => $ensure,
     tag     => 'postgresql',
   }
 
   file { '/etc/barman.conf.d':
-    ensure  => directory,
+    ensure  => $ensure_directory,
     owner   => 'root',
-    group   => 'barman',
+    group   => $group,
     mode    => '0750',
     require => Package['barman'],
   }
 
   file { '/etc/barman.conf':
-    ensure  => present,
+    ensure  => $ensure_file,
     owner   => 'root',
-    group   => 'barman',
+    group   => $group,
     mode    => '0640',
-    content => template('barman/barman.conf'),
+    content => template($conf_template),
     require => File['/etc/barman.conf.d'],
   }
 
   file { $home:
-    ensure  => directory,
-    owner   => 'barman',
-    group   => 'barman',
+    ensure  => $ensure_directory,
+    owner   => $user,
+    group   => $group,
     mode    => '0750',
     require => Package['barman']
   }
@@ -98,11 +112,11 @@ class barman (
   }
 
   file { '/etc/logrotate.d/barman':
-    ensure  => present,
+    ensure  => $ensure_file,
     owner   => 'root',
-    group   => 'barman',
+    group   => $group,
     mode    => '0644',
-    content => template('barman/logrotate.conf'),
+    content => template($logrotate_template),
     require => Package['barman']
   }
 
