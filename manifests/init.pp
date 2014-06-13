@@ -45,11 +45,21 @@
 #
 # === Authors
 #
+# * Giuseppe Broccolo <giuseppe.broccolo@2ndQuadrant.it>
+# * Giulio Calacoci <giulio.calacoci@2ndQuadrant.it>
+# * Francesco Canovai <francesco.canovai@2ndQuadrant.it>
+# * Marco Nenciarini <marco.nenciarini@2ndQuadrant.it>
+# * Gabriele Bartolini <gabriele.bartolini@2ndQuadrant.it>
+#
+# Many thanks to Alessandro Franceschi <al@lab42.it>
+#
+# === Past authors
+#
 # Alessandro Grassi <alessandro.grassi@devise.it>
 #
 # === Copyright
 #
-# Copyright 2012 Devise.IT SRL
+# Copyright 2012-2014 2ndQuadrant Italia (Devise.IT SRL)
 #
 class barman (
   $user               = 'barman',
@@ -63,7 +73,10 @@ class barman (
   $pre_backup_script  = false,
   $post_backup_script = false,
   $custom_lines       = '',
+  $autoconfigure      = false,
 ) {
+
+  validate_bool($autoconfigure)
 
   $ensure_file = $ensure ? {
     'absent' => 'absent',
@@ -118,6 +131,10 @@ class barman (
     mode    => '0644',
     content => template($logrotate_template),
     require => Package['barman']
+  }
+
+  if $autoconfigure {
+    include barman::autoconfigure
   }
 
 }
