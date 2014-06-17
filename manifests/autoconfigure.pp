@@ -13,7 +13,7 @@ class barman::autoconfigure (
   # Import Resources exported by Postgres Servers
   File_line <<| tag == "barman_pgpass_${host_group}" |>>
   Barman::Server <<| tag == "barman-${host_group}" |>> {
-    barman_user => $::barman::settings::dbuser,
+    #    barman_user => $::barman::settings::dbuser,
     require     => Class['barman'],
   }
   Cron <<| tag == "barman-${host_group}" |>> {

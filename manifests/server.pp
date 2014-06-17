@@ -60,7 +60,7 @@ define barman::server (
     ensure  => $ensure,
     mode    => '0640',
     owner   => 'root',
-    group   => $barman::group,
+    group   => $::barman::settings::group,
     content => template($conf_template),
   }
 

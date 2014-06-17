@@ -1,16 +1,16 @@
 class barman::postgres (
-  $host_group     = $barman::settings::host_group,
+  $host_group     = $::barman::settings::host_group,
   $wal_level      = 'archive',
-  $barman_user    = $barman::settings::user,
-  $barman_dbuser  = $barman::settings::dbuser,
-  $barman_dbname  = $barman::settings::dbname,
+  $barman_user    = $::barman::settings::user,
+  $barman_dbuser  = $::barman::settings::dbuser,
+  $barman_dbname  = $::barman::settings::dbname,
   $backup_wday    = undef,
   $backup_hour    = 4,
   $backup_minute  = 0,
   $password       = '',
   $server_address = $::fqdn,
   $postgres_server_id = $::hostname,
-) inherits barman::settings {
+) inherits ::barman::settings {
 
   unless defined(Class['postgresql::server']) {
     fail('barman::server requires the postgresql::server module installed and configured')
@@ -24,7 +24,7 @@ class barman::postgres (
   # configure server for archive mode
   postgresql::server::config_entry {
     'archive_mode': value => 'on';
-    'wal_level': value => $wal_level;
+    'wal_level': value => "${wal_level}";
   }
 
   postgresql::server::role { $barman_dbuser:

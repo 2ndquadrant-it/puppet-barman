@@ -62,19 +62,19 @@
 # Copyright 2012-2014 2ndQuadrant Italia (Devise.IT SRL)
 #
 class barman (
-  $user               = $barman::settings::user,
-  $group              = $barman::settings::group,
+  $user               = $::barman::settings::user,
+  $group              = $::barman::settings::group,
   $ensure             = 'present',
   $conf_template      = 'barman/barman.conf',
   $logrotate_template = 'barman/logrotate.conf',
-  $home               = $barman::settings::home,
+  $home               = $::barman::settings::home,
   $logfile            = '/var/log/barman/barman.log',
   $compression        = 'gzip',
   $pre_backup_script  = false,
   $post_backup_script = false,
   $custom_lines       = '',
   $barman_ipaddress   = $::ipaddress,
-  $autoconfigure      = $barman::settings::autoconfigure,
+  $autoconfigure      = $::barman::settings::autoconfigure,
 ) inherits barman::settings {
 
   validate_bool($autoconfigure)
@@ -89,6 +89,9 @@ class barman (
     default  => 'directory',
   }
 
+  class { 'postgresql::globals':
+    manage_package_repo => true,
+  } ->
   package { 'barman':
     ensure  => $ensure,
     tag     => 'postgresql',
@@ -135,7 +138,7 @@ class barman (
   }
 
   if $autoconfigure {
-    include barman::autoconfigure
+    include ::barman::autoconfigure
   }
 
 }
