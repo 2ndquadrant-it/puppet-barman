@@ -17,6 +17,7 @@ define barman::archive_command (
   }
 
   postgresql::server::config_entry { "archive_command_${title}":
+    name  => "archive_command",
     value => "rsync -a %p ${barman_user}@${barman_server}:${real_barman_incoming_dir}/%f",
   }
 }

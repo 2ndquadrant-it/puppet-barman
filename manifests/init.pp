@@ -73,7 +73,7 @@ class barman (
   $pre_backup_script  = false,
   $post_backup_script = false,
   $custom_lines       = '',
-  $barman_ipaddress   = $::ipaddress,
+  $barman_fqdn        = $::fqdn,
   $autoconfigure      = $::barman::settings::autoconfigure,
 ) inherits barman::settings {
 

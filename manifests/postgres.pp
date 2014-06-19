@@ -4,12 +4,14 @@ class barman::postgres (
   $barman_user    = $::barman::settings::user,
   $barman_dbuser  = $::barman::settings::dbuser,
   $barman_dbname  = $::barman::settings::dbname,
+  $barman_home    = $::barman::settings::home,
   $backup_wday    = undef,
   $backup_hour    = 4,
   $backup_minute  = 0,
   $password       = '',
   $server_address = $::fqdn,
   $postgres_server_id = $::hostname,
+  $postgres_user      = 'postgres',
 ) inherits ::barman::settings {
 
   unless defined(Class['postgresql::server']) {
@@ -37,7 +39,9 @@ class barman::postgres (
   Barman::Archive_command <<| tag == "barman-${host_group}" |>> {
     postgres_server_id => $postgres_server_id,
   }
+
   Postgresql::Server::Pg_hba_rule <<| tag == "barman-${host_group}" |>>
+
   Ssh_authorized_key <<| tag == "barman-${host_group}" |>> {
     require => Class['postgresql::server'],
   }
@@ -45,7 +49,7 @@ class barman::postgres (
   # Export resources to Barman server
   @@barman::server { $::hostname:
     conninfo    => "user=${barman_dbuser} dbname=${barman_dbname} host=${server_address}",
-    ssh_command => "ssh ${barman_user}@${server_address}",
+    ssh_command => "ssh ${postgres_user}@${server_address}",
     tag         => "barman-${host_group}",
   }
 
@@ -59,7 +63,7 @@ class barman::postgres (
   }
 
   @@file_line { "barman_pgpass_content-${::hostname}":
-    path   => "${::barman::settings::barman_home}/.pgpass",
+    path   => "${barman_home}/.pgpass",
     line   => "${server_address}:*:${barman_dbname}:${barman_dbuser}:${real_password}",
     tag    => "barman-${host_group}",
   }
