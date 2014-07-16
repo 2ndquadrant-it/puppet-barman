@@ -49,7 +49,7 @@ define barman::server (
   $custom_lines = '',
 ) {
 
-  validate_re($name, '^[0-9a-z-/]*$', "${name} is not a valid name. Please only use lowercase letters, numbers, slashes and hyphens.")
+  validate_re($name, '^[0-9a-z\-/]*$', "${name} is not a valid name. Please only use lowercase letters, numbers, slashes and hyphens.")
 
   file { "/etc/barman.conf.d/${name}.conf":
     ensure  => present,
