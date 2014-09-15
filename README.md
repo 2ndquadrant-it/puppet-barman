@@ -58,11 +58,11 @@ All the configuration options that Barman accepts can be overridden from the pac
 Example usage:
 
     class { barman:
-      logfile  => '/var/log/barman/something_else.log',
-      compression => 'bzip2',
-      pre_backup_script = '/usr/bin/touch /tmp/started',
-      post_backup_script = '/usr/bin/touch /tmp/stopped',
-      custom_lines = '; something'
+      logfile            => '/var/log/barman/something_else.log',
+      compression        => 'bzip2',
+      pre_backup_script  => '/usr/bin/touch /tmp/started',
+      post_backup_script => '/usr/bin/touch /tmp/stopped',
+      custom_lines       => '; something'
     }
 
 #### Parameters
@@ -135,12 +135,12 @@ Overriding global configuration is supported for most of the parameters.
 Example:
 
     barman::server { 'main':
-      conninfo    => 'user=postgres host=server1 password=pg123',
-      ssh_command => 'ssh postgres@server1',
-      compression => 'bzip2',
-      pre_backup_script = '/usr/bin/touch /tmp/started',
-      post_backup_script = '/usr/bin/touch /tmp/stopped',
-      custom_lines = '; something'
+      conninfo           => 'user=postgres host=server1 password=pg123',
+      ssh_command        => 'ssh postgres@server1',
+      compression        => 'bzip2',
+      pre_backup_script  => '/usr/bin/touch /tmp/started',
+      post_backup_script => '/usr/bin/touch /tmp/stopped',
+      custom_lines       => '; something'
     }
 
 **Note**: it is not recommended to specify passwords in the `conninfo`
