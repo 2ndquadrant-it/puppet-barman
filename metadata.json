@@ -1,0 +1,14 @@
+{
+  "name": "it2ndq-barman",
+  "version": "0.2.1",
+  "author": "it2ndq",
+  "summary": "Barman (Backup and Recovery Manager for PostgreSQL) module",
+  "license": "GPL v3",
+  "source": "git://github.com/2ndquadrant-it/puppet-barman.git",
+  "project_page": "http://github.com/2ndquadrant-it/puppet-barman",
+  "issues_url": "https://github.com/2ndquadrant-it/puppet-barman/issues",
+  "description": "Automates Barman installation and server setup",
+  "dependencies": [
+    {"name":"puppetlabs/stdlib","version_requirement":">=3.2.0 <5.0.0"}
+  ]
+}
