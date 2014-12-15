@@ -96,6 +96,7 @@ class barman (
   $custom_lines       = '',
   $barman_fqdn        = $::fqdn,
   $autoconfigure      = $::barman::settings::autoconfigure,
+  $manage_repo        = $barman::settings::manage_repo,
 ) inherits barman::settings {
 
   # Check if autoconfigure is a boolean
@@ -111,9 +112,12 @@ class barman (
     default  => 'directory',
   }
 
-  class { 'postgresql::globals':
-    manage_package_repo => true,
-  } ->
+  if $manage_repo {
+    class { 'postgresql::globals':
+      manage_package_repo => true,
+      before              => Package['barman'],
+    }
+  }
   package { 'barman':
     ensure  => $ensure,
     tag     => 'postgresql',

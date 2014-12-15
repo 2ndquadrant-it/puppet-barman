@@ -57,6 +57,7 @@ class barman::settings (
   $custom_lines       = '',
   $autoconfigure      = false,
   $host_group         = 'global',
+  $manage_repo        = true,
 ) {
 
 }
