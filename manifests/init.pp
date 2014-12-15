@@ -111,9 +111,12 @@ class barman (
     default  => 'directory',
   }
 
-  class { 'postgresql::globals':
-    manage_package_repo => true,
-  } ->
+  if !defined(Class['postgresql::globals']) {
+    class { 'postgresql::globals':
+      manage_package_repo => true,
+      before              => Package['barman'],
+    }
+  }
   package { 'barman':
     ensure  => $ensure,
     tag     => 'postgresql',
