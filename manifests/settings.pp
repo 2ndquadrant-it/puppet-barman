@@ -45,19 +45,19 @@
 # Copyright 2012-2014 2ndQuadrant Italia (Devise.IT SRL)
 #
 class barman::settings (
-  $user               = 'barman',
-  $group              = 'barman',
-  $dbuser             = 'barman',
-  $dbname             = 'postgres',
-  $home               = '/var/lib/barman',
-  $logfile            = '/var/log/barman/barman.log',
-  $compression        = 'gzip',
-  $pre_backup_script  = false,
-  $post_backup_script = false,
-  $custom_lines       = '',
-  $autoconfigure      = false,
-  $host_group         = 'global',
-  $manage_repo        = true,
+  $user                = 'barman',
+  $group               = 'barman',
+  $dbuser              = 'barman',
+  $dbname              = 'postgres',
+  $home                = '/var/lib/barman',
+  $logfile             = '/var/log/barman/barman.log',
+  $compression         = 'gzip',
+  $pre_backup_script   = false,
+  $post_backup_script  = false,
+  $custom_lines        = '',
+  $autoconfigure       = false,
+  $host_group          = 'global',
+  $manage_package_repo = true,
 ) {
 
 }
