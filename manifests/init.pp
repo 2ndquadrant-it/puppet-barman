@@ -115,7 +115,6 @@ class barman (
   if $manage_package_repo {
     class { 'postgresql::globals':
       manage_package_repo => true,
-      before              => Package['barman'],
     }
   }
   package { 'barman':
