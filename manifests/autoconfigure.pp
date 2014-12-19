@@ -92,13 +92,13 @@ class barman::autoconfigure (
 
   # export configuration for the pg_hba.conf
   @@postgresql::server::pg_hba_rule { "barman ${::hostname} client access":
-    description => "barman ${::hostname} client access",
-    type        => 'host',
-    database    => $barman::settings::dbname,
-    user        => $barman::settings::dbuser,
-    address     => "${::exported_ipaddress}/32",
-    auth_method => 'md5',
-    tag         => "barman-${host_group}",
+    description  => "barman ${::hostname} client access",
+    type         => 'host',
+    database     => $barman::settings::dbname,
+    user         => $barman::settings::dbuser,
+    address      => "${exported_ipaddress}/32",
+    auth_method  => 'md5',
+    tag          => "barman-${host_group}",
   }
 
 }
