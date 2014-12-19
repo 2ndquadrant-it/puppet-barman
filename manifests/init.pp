@@ -83,20 +83,20 @@
 # Copyright 2012-2014 2ndQuadrant Italia (Devise.IT SRL)
 #
 class barman (
-  $user               = $::barman::settings::user,
-  $group              = $::barman::settings::group,
-  $ensure             = 'present',
-  $conf_template      = 'barman/barman.conf',
-  $logrotate_template = 'barman/logrotate.conf',
-  $home               = $::barman::settings::home,
-  $logfile            = '/var/log/barman/barman.log',
-  $compression        = 'gzip',
-  $pre_backup_script  = false,
-  $post_backup_script = false,
-  $custom_lines       = '',
-  $barman_fqdn        = $::fqdn,
-  $autoconfigure      = $::barman::settings::autoconfigure,
-  $manage_repo        = $barman::settings::manage_repo,
+  $user                = $::barman::settings::user,
+  $group               = $::barman::settings::group,
+  $ensure              = 'present',
+  $conf_template       = 'barman/barman.conf',
+  $logrotate_template  = 'barman/logrotate.conf',
+  $home                = $::barman::settings::home,
+  $logfile             = '/var/log/barman/barman.log',
+  $compression         = 'gzip',
+  $pre_backup_script   = false,
+  $post_backup_script  = false,
+  $custom_lines        = '',
+  $barman_fqdn         = $::fqdn,
+  $autoconfigure       = $::barman::settings::autoconfigure,
+  $manage_package_repo = $::barman::settings::manage_package_repo,
 ) inherits barman::settings {
 
   # Check if autoconfigure is a boolean
@@ -112,10 +112,9 @@ class barman (
     default  => 'directory',
   }
 
-  if $manage_repo {
+  if $manage_package_repo {
     class { 'postgresql::globals':
       manage_package_repo => true,
-      before              => Package['barman'],
     }
   }
   package { 'barman':
