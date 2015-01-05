@@ -24,6 +24,10 @@
 #                         (default).
 # [*post_backup_script*] - Script to launch after backups. Disabled if false
 #                          (default).
+# [*pre_archive_script*] - Script to launch before a WAL file is archived by maintenance. Disabled if false
+#                          (default).
+# [*post_archive_script*] - Script to launch after a WAL file is archived by maintenance. Disabled if false
+#                          (default).
 # [*custom_lines*] - Custom configuration directives (e.g. for custom
 #                    compression). Defaults to empty.
 # [*barman_fqdn*] - The fqdn of the Barman server. It will be exported in several
@@ -93,6 +97,8 @@ class barman (
   $compression         = 'gzip',
   $pre_backup_script   = false,
   $post_backup_script  = false,
+  $pre_archive_script  = false,
+  $post_archive_scirpt = false,
   $custom_lines        = '',
   $barman_fqdn         = $::fqdn,
   $autoconfigure       = $::barman::settings::autoconfigure,
@@ -124,7 +130,7 @@ class barman (
 
   file { '/etc/barman.conf.d':
     ensure  => $ensure_directory,
-    owner   => 'root',
+    owner   => 'root',/
     group   => $group,
     mode    => '0750',
     require => Package['barman'],
