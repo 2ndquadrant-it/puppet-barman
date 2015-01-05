@@ -130,7 +130,7 @@ class barman (
 
   file { '/etc/barman.conf.d':
     ensure  => $ensure_directory,
-    owner   => 'root',/
+    owner   => 'root',
     group   => $group,
     mode    => '0750',
     require => Package['barman'],
