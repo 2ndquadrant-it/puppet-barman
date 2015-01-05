@@ -60,13 +60,15 @@
 define barman::server (
   $conninfo,
   $ssh_command,
-  $ensure             = 'present',
-  $conf_template      = 'barman/server.conf',
-  $description        = $name,
-  $compression        = false,
-  $pre_backup_script  = false,
-  $post_backup_script = false,
-  $custom_lines       = '',
+  $ensure              = 'present',
+  $conf_template       = 'barman/server.conf',
+  $description         = $name,
+  $compression         = false,
+  $pre_backup_script   = false,
+  $post_backup_script  = false,
+  $pre_archive_script  = false,
+  $post_archive_scirpt = false,
+  $custom_lines        = '',
 ) {
 
   # check if 'description' has been correctly configured
