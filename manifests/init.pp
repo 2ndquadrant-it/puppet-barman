@@ -28,6 +28,8 @@
 #                          (default).
 # [*post_archive_script*] - Script to launch after a WAL file is archived by maintenance. Disabled if false
 #                          (default).
+# {*immediate_checkpoint*] -  Force the checkpoint on the Postgres server to happen immediately and start your backup copy process as soon as possible. Disabled if false
+#                          (default.)
 # [*custom_lines*] - Custom configuration directives (e.g. for custom
 #                    compression). Defaults to empty.
 # [*barman_fqdn*] - The fqdn of the Barman server. It will be exported in several
@@ -87,26 +89,28 @@
 # Copyright 2012-2014 2ndQuadrant Italia (Devise.IT SRL)
 #
 class barman (
-  $user                = $::barman::settings::user,
-  $group               = $::barman::settings::group,
-  $ensure              = 'present',
-  $conf_template       = 'barman/barman.conf',
-  $logrotate_template  = 'barman/logrotate.conf',
-  $home                = $::barman::settings::home,
-  $logfile             = '/var/log/barman/barman.log',
-  $compression         = 'gzip',
-  $pre_backup_script   = false,
-  $post_backup_script  = false,
-  $pre_archive_script  = false,
-  $post_archive_scirpt = false,
-  $custom_lines        = '',
-  $barman_fqdn         = $::fqdn,
-  $autoconfigure       = $::barman::settings::autoconfigure,
-  $manage_package_repo = $::barman::settings::manage_package_repo,
+  $user                 = $::barman::settings::user,
+  $group                = $::barman::settings::group,
+  $ensure               = 'present',
+  $conf_template        = 'barman/barman.conf',
+  $logrotate_template   = 'barman/logrotate.conf',
+  $home                 = $::barman::settings::home,
+  $logfile              = '/var/log/barman/barman.log',
+  $compression          = 'gzip',
+  $immediate_checkpoint = false
+  $pre_backup_script    = false,
+  $post_backup_script   = false,
+  $pre_archive_script   = false,
+  $post_archive_scirpt  = false,
+  $custom_lines         = '',
+  $barman_fqdn          = $::fqdn,
+  $autoconfigure        = $::barman::settings::autoconfigure,
+  $manage_package_repo  = $::barman::settings::manage_package_repo,
 ) inherits barman::settings {
 
   # Check if autoconfigure is a boolean
   validate_bool($autoconfigure)
+  validate_bool($immediate_checkpoint)
 
   # Ensure creation (or removal) of Barman files and directories
   $ensure_file = $ensure ? {
