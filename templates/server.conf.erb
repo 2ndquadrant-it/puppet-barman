@@ -7,9 +7,15 @@
 description = "<%= @description %>"
 ssh_command = <%= @ssh_command %>
 conninfo = <%= @conninfo %>
-<%= "compression = #{compression}" if @compression %>
-<%= "pre_backup_script = #{pre_backup_script}" if @pre_backup_script %>
-<%= "post_backup_script = #{post_backup_script}" if @post_backup_script %>
-<%= "pre_archive_script = #{@pre_archive_script}" if @pre_archive_script %>
-<%= "post_archive_script = #{@post_archive_script}" if @post_archive_script %>
+<%- if @compression -%>
+compression = <%= @compression %>
+<%- end -%>
+<%- if @pre_backup_script != false -%>
+pre_backup_script = <%= @pre_backup_script %>
+<%- end -%>
+<%- if @post_backup_script != false -%>
+post_backup_script = <%= @post_backup_script %>
+<%- end -%>
+<%- if @custom_lines -%>
 <%= @custom_lines %>
+<%- end -%>
