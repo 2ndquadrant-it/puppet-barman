@@ -61,12 +61,12 @@ define barman::server (
   $conninfo,
   $ssh_command,
   $ensure             = 'present',
-  $conf_template      = 'barman/server.conf',
+  $conf_template      = 'barman/server.conf.erb',
   $description        = $name,
   $compression        = false,
   $pre_backup_script  = false,
   $post_backup_script = false,
-  $custom_lines       = '',
+  $custom_lines       = undef,
 ) {
 
   # check if 'description' has been correctly configured
