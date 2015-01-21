@@ -24,6 +24,8 @@
 #                         configuration if false (default).
 # [*post_backup_script*] - Script to launch after backups. Uses the global
 #                         configuration if false (default).
+# [*immediate_checkpoint*] -  Force the checkpoint on the Postgres server to happen immediately and start your backup copy process as soon as possible. Disabled if false
+#                          (default.)
 # [*custom_lines*] - Custom configuration directives (e.g. for custom
 #                    compression). Defaults to empty.
 #
@@ -60,13 +62,14 @@
 define barman::server (
   $conninfo,
   $ssh_command,
-  $ensure             = 'present',
-  $conf_template      = 'barman/server.conf.erb',
-  $description        = $name,
-  $compression        = false,
-  $pre_backup_script  = false,
-  $post_backup_script = false,
-  $custom_lines       = undef,
+  $ensure               = 'present',
+  $conf_template        = 'barman/server.conf.erb',
+  $description          = $name,
+  $compression          = false,
+  $immediate_checkpoint = false,
+  $pre_backup_script    = false,
+  $post_backup_script   = false,
+  $custom_lines         = undef,
 ) {
 
   # check if 'description' has been correctly configured
@@ -74,6 +77,9 @@ define barman::server (
 
   # check if 'description' has been correctly configured
   validate_re($name, '^[0-9a-z\-/]*$', "${name} is not a valid name. Please only use lowercase letters, numbers, slashes and hyphens.")
+
+  # check if immediate checkpoint is a boolean
+  validate_bool($immediate_checkpoint)
 
   if $custom_lines != '' {
     notice "The 'custom_lines' option is deprecated. Please use \$conf_template for custom configuration"

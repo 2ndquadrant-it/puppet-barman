@@ -16,6 +16,9 @@ pre_backup_script = <%= @pre_backup_script %>
 <%- if @post_backup_script != false -%>
 post_backup_script = <%= @post_backup_script %>
 <%- end -%>
+<%- if @immediate_checkpoint != false -%>
+immediate_checkpoint = <%= @immediate_checkpoint %>
+<%- end -%>
 <%- if @custom_lines -%>
 <%= @custom_lines %>
 <%- end -%>
