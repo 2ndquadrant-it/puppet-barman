@@ -25,6 +25,12 @@ pre_archive_script = <%= @pre_archive_script %>
 <%- if @post_archive_script != false -%>
 post_archive_script = <%= @post_archive_script %>
 <%- end -%>
+<%- if @basebackup_retry_times != false -%>
+basebackup_retry_times = <%= @basebackup_retry_times %>
+<%- end -%>
+<%- if @basebackup_retry_sleep != false -%>
+basebackup_retry_sleep = <%= @basebackup_retry_sleep %>
+<%- end -%>
 <%- if @custom_lines -%>
 <%= @custom_lines %>
 <%- end -%>
