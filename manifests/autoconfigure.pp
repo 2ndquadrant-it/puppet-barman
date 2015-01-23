@@ -74,7 +74,7 @@ class barman::autoconfigure (
   ############## Export resources to Postgres Servers
 
   # export the archive command
-  @@barman::archive_command { "${::barman::barman_fqdn}":
+  @@barman::archive_command { $::barman::barman_fqdn :
     tag                 => "barman-${host_group}",
   }
 

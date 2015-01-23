@@ -98,7 +98,7 @@ class barman::postgres (
   # Configure PostgreSQL server for archive mode
   postgresql::server::config_entry {
     'archive_mode': value => 'on';
-    'wal_level': value => "${wal_level}";
+    'wal_level': value => $wal_level;
   }
 
   # define user used by Barman to connect into PostgreSQL database(s)

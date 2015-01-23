@@ -44,7 +44,7 @@ define barman::archive_command (
   # Ensure that 'postgres' class correctly configure the 'archive_command'
   if $postgres_server_id == 'default'
   and $barman_incoming_dir == '' {
-    fail "You must pass either postgres_server_id or barman_incoming_dir"
+    fail 'You must pass either postgres_server_id or barman_incoming_dir'
   }
 
   # Generate path if not explicitely defined
@@ -54,7 +54,7 @@ define barman::archive_command (
   }
 
   postgresql::server::config_entry { "archive_command_${title}":
-    name  => "archive_command",
+    name  => 'archive_command',
     value => "rsync -a %p ${barman_user}@${barman_server}:${real_barman_incoming_dir}/%f",
   }
 }

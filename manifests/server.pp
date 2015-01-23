@@ -114,7 +114,7 @@ define barman::server (
   validate_re($minimum_redundancy, [ '^[0-9]+$' ])
 
   if $custom_lines != '' {
-    notice "The 'custom_lines' option is deprecated. Please use \$conf_template for custom configuration"
+    notice 'The \'custom_lines\' option is deprecated. Please use $conf_template for custom configuration'
   }
 
   file { "/etc/barman.conf.d/${name}.conf":
