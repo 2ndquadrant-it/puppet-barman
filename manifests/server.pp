@@ -26,6 +26,10 @@
 #                         configuration if false (default).
 # [*immediate_checkpoint*] -  Force the checkpoint on the Postgres server to happen immediately and start your backup copy process as soon as possible. Disabled if false
 #                          (default.)
+# [*pre_archive_script*] - Script to launch before a WAL file is archived by maintenance. Disabled if false
+#                          (default).
+# [*post_archive_script*] - Script to launch after a WAL file is archived by maintenance. Disabled if false
+#                          (default).
 # [*custom_lines*] - Custom configuration directives (e.g. for custom
 #                    compression). Defaults to empty.
 #
@@ -69,6 +73,8 @@ define barman::server (
   $immediate_checkpoint = false,
   $pre_backup_script    = false,
   $post_backup_script   = false,
+  $pre_archive_script   = false,
+  $post_archive_scirpt  = false,
   $custom_lines         = undef,
 ) {
 
