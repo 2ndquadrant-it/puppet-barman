@@ -22,6 +22,9 @@ pre_archive_script = <%= @pre_archive_script %>
 <%- if @post_archive_script != false -%>
 post_archive_script = <%= @post_archive_script %>
 <%- end -%>
+<%- if @immediate_checkpoint != false -%>
+immediate_checkpoint = <%= @immediate_checkpoint %>
+<%- end -%>
 configuration_files_directory = /etc/barman.conf.d
 <%- if @custom_lines -%>
 <%= @custom_lines %>
