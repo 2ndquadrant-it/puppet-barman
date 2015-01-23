@@ -32,6 +32,8 @@
 #                          (default.)
 # [*basebackup_retry_times*] - Number of retries fo data copy during base backup after an error. Default = 0
 # [*basebackup_retry_sleep*] - Number of seconds to wait after after a failed copy, before retrying. Default = 30
+# [*backup_options*] - Behavior for backup operations: possible values are exclusive_backup (default)
+#                      and concurrent_backup
 # [*custom_lines*] - Custom configuration directives (e.g. for custom
 #                    compression). Defaults to empty.
 # [*barman_fqdn*] - The fqdn of the Barman server. It will be exported in several
@@ -106,6 +108,7 @@ class barman (
   $post_archive_scirpt    = false,
   $basebackup_retry_times = false,
   $basebackup_retry_sleep = false,
+  $backup_options         = 'exclusive_backup',
   $custom_lines           = undef,
   $barman_fqdn            = $::fqdn,
   $autoconfigure          = $::barman::settings::autoconfigure,
@@ -114,6 +117,9 @@ class barman (
 
   # Check if autoconfigure is a boolean
   validate_bool($autoconfigure)
+
+  # Check if backup_options has correct values
+  validate_re($backup_options, [ '^exclusive_backup$', '^concurrent_backup$', 'Invalid backup option please use exclusive_backup or concurrent_backup' ])
 
   # Check if immediate checkpoint is a boolean
   validate_bool($immediate_checkpoint)

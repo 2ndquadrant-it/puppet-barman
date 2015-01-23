@@ -32,6 +32,8 @@
 #                          (default).
 # [*basebackup_retry_times*] - Number of retries fo data copy during base backup after an error. Default = 0
 # [*basebackup_retry_sleep*] - Number of seconds to wait after after a failed copy, before retrying. Default = 30
+# [*backup_options*] - Behavior for backup operations: possible values are exclusive_backup (default)
+#                      and concurrent_backup
 # [*custom_lines*] - Custom configuration directives (e.g. for custom
 #                    compression). Defaults to empty.
 #
@@ -79,11 +81,15 @@ define barman::server (
   $post_archive_scirpt    = false,
   $basebackup_retry_times = false,
   $basebackup_retry_sleep = false,
+  $backup_options         = 'exclusive_backup',
   $custom_lines           = undef,
 ) {
 
   # check if 'description' has been correctly configured
   validate_re($ensure, '^(present|absent)$', "${ensure} is not a valid value (ensure = present|absent).")
+
+  # check if backup_options has correct values
+  validate_re($backup_options, [ '^exclusive_backup$', '^concurrent_backup$', 'Invalid backup option please use exclusive_backup or concurrent_backup' ]) 
 
   # check if 'description' has been correctly configured
   validate_re($name, '^[0-9a-z\-/]*$', "${name} is not a valid name. Please only use lowercase letters, numbers, slashes and hyphens.")
