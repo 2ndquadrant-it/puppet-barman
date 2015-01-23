@@ -34,6 +34,8 @@
 # [*basebackup_retry_sleep*] - Number of seconds to wait after after a failed copy, before retrying. Default = 30
 # [*backup_options*] - Behavior for backup operations: possible values are exclusive_backup (default)
 #                      and concurrent_backup
+# [*minimum_redundancy*] - Minimum number of required backups (redundancy). Default 0
+#                          (default).
 # [*custom_lines*] - Custom configuration directives (e.g. for custom
 #                    compression). Defaults to empty.
 #
@@ -82,6 +84,7 @@ define barman::server (
   $basebackup_retry_times = false,
   $basebackup_retry_sleep = false,
   $backup_options         = 'exclusive_backup',
+  $minimum_redundancy     = '0',
   $custom_lines           = undef,
 ) {
 
@@ -106,6 +109,9 @@ define barman::server (
   if $basebackup_retry_sleep != false {
     validate_re($basebackup_retry_sleep, [ '^[0-9]+$' ])
   }
+
+  # check if minimum_redundancy is a number
+  validate_re($minimum_redundancy, [ '^[0-9]+$' ])
 
   if $custom_lines != '' {
     notice "The 'custom_lines' option is deprecated. Please use \$conf_template for custom configuration"
