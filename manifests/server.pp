@@ -30,6 +30,8 @@
 #                          (default).
 # [*post_archive_script*] - Script to launch after a WAL file is archived by maintenance. Disabled if false
 #                          (default).
+# [*basebackup_retry_times*] - Number of retries fo data copy during base backup after an error. Default = 0
+# [*basebackup_retry_sleep*] - Number of seconds to wait after after a failed copy, before retrying. Default = 30
 # [*custom_lines*] - Custom configuration directives (e.g. for custom
 #                    compression). Defaults to empty.
 #
@@ -66,16 +68,18 @@
 define barman::server (
   $conninfo,
   $ssh_command,
-  $ensure               = 'present',
-  $conf_template        = 'barman/server.conf.erb',
-  $description          = $name,
-  $compression          = false,
-  $immediate_checkpoint = false,
-  $pre_backup_script    = false,
-  $post_backup_script   = false,
-  $pre_archive_script   = false,
-  $post_archive_scirpt  = false,
-  $custom_lines         = undef,
+  $ensure                 = 'present',
+  $conf_template          = 'barman/server.conf.erb',
+  $description            = $name,
+  $compression            = false,
+  $immediate_checkpoint   = false,
+  $pre_backup_script      = false,
+  $post_backup_script     = false,
+  $pre_archive_script     = false,
+  $post_archive_scirpt    = false,
+  $basebackup_retry_times = false,
+  $basebackup_retry_sleep = false,
+  $custom_lines           = undef,
 ) {
 
   # check if 'description' has been correctly configured
@@ -86,6 +90,16 @@ define barman::server (
 
   # check if immediate checkpoint is a boolean
   validate_bool($immediate_checkpoint)
+
+  # check to make sure basebackup_retry_times is a numerical value
+  if $basebackup_retry_times != false {
+    validate_re($basebackup_retry_times, [ '^[0-9]+$' ])
+  }
+
+  # check to make sure basebackup_retry_sleep is a numerical value
+  if $basebackup_retry_sleep != false {
+    validate_re($basebackup_retry_sleep, [ '^[0-9]+$' ])
+  }
 
   if $custom_lines != '' {
     notice "The 'custom_lines' option is deprecated. Please use \$conf_template for custom configuration"
