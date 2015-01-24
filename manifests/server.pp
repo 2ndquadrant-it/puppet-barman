@@ -36,6 +36,10 @@
 #                      and concurrent_backup
 # [*minimum_redundancy*] - Minimum number of required backups (redundancy). Default 0
 #                          (default).
+# [*last_backup_maximum_age*] - Time frame that must contain the latest backup date.
+#                               If the latest backup is older than the time frame, barman check
+#                               command will report an error to the user. Empty if false.
+#                             (default)
 # [*custom_lines*] - Custom configuration directives (e.g. for custom
 #                    compression). Defaults to empty.
 #
@@ -72,20 +76,21 @@
 define barman::server (
   $conninfo,
   $ssh_command,
-  $ensure                 = 'present',
-  $conf_template          = 'barman/server.conf.erb',
-  $description            = $name,
-  $compression            = false,
-  $immediate_checkpoint   = false,
-  $pre_backup_script      = false,
-  $post_backup_script     = false,
-  $pre_archive_script     = false,
-  $post_archive_scirpt    = false,
-  $basebackup_retry_times = false,
-  $basebackup_retry_sleep = false,
-  $backup_options         = 'exclusive_backup',
-  $minimum_redundancy     = '0',
-  $custom_lines           = undef,
+  $ensure                  = 'present',
+  $conf_template           = 'barman/server.conf.erb',
+  $description             = $name,
+  $compression             = false,
+  $immediate_checkpoint    = false,
+  $pre_backup_script       = false,
+  $post_backup_script      = false,
+  $pre_archive_script      = false,
+  $post_archive_scirpt     = false,
+  $basebackup_retry_times  = false,
+  $basebackup_retry_sleep  = false,
+  $backup_options          = 'exclusive_backup',
+  $minimum_redundancy      = '0',
+  $last_backup_maximum_age = false,
+  $custom_lines            = undef,
 ) {
 
   # check if 'description' has been correctly configured
@@ -112,6 +117,9 @@ define barman::server (
 
   # check if minimum_redundancy is a number
   validate_re($minimum_redundancy, [ '^[0-9]+$' ])
+
+  # check to make sure last_backup_maximum_age identifies (DAYS | WEEKS | MONTHS) greater then 0
+  validate_re($last_backup_maximum_age, [ '^[1-9][0-9]* (DAYS|WEEKS|MONTHS)$' ]) 
 
   if $custom_lines != '' {
     notice 'The \'custom_lines\' option is deprecated. Please use $conf_template for custom configuration'
