@@ -40,6 +40,17 @@
 #                               If the latest backup is older than the time frame, barman check
 #                               command will report an error to the user. Empty if false.
 #                             (default)
+# [*retention_policy*] - Base backup retention policy, based on redundancy or recovery window. 
+#                        Default empty (no retention enforced)
+#                        Value must be greater than or equal to the server minimum redundancy level
+#                        (if not is is assigned to that value and a warning is generated);
+#                      (default.)
+# [*wal_retention_policy*] - WAL archive logs retention policy. Currently, the only allowed value for
+#                            wal_retention_policy is the special value main, that maps the retention
+#                            policy of archive logs to that of base backups.
+#                          (default.)
+# [*retention_policy_mode*] - Can only be set to auto (retention policies are automatically enforced by the barman cron command).
+#                           (default.)
 # [*custom_lines*] - Custom configuration directives (e.g. for custom
 #                    compression). Defaults to empty.
 # [*barman_fqdn*] - The fqdn of the Barman server. It will be exported in several
@@ -117,6 +128,9 @@ class barman (
   $backup_options          = 'exclusive_backup',
   $minimum_redundancy      = '0',
   $last_backup_maximum_age = false,
+  $retention_policy        = '',
+  $retention_policy_mode   = 'auto',
+  $wal_retention_policy    = 'main',
   $custom_lines            = undef,
   $barman_fqdn             = $::fqdn,
   $autoconfigure           = $::barman::settings::autoconfigure,
@@ -146,6 +160,15 @@ class barman (
   
   # Check to make sure last_backup_maximum_age identifies (DAYS | WEEKS | MONTHS) greater then 0
   validate_re($last_backup_maximum_age, [ '^[1-9][0-9]* (DAYS|WEEKS|MONTHS)$' ])
+
+  # Check to make sure retention_policy has correct value
+  validate_re($retention_policy, [ '^(^$|REDUNDANCY [1-9][0-9]*|RECOVERY WINDOW OF [1-9][0-9]* (DAYS|WEEKS|MONTHS))$' ])
+
+  # Check to make sure retention_policy_mode is set to auto
+  validate_re($retention_policy_mode, [ '^auto$' ])
+
+  # Check to make sure wal_retention_policy is set to main
+  validate_re($wal_retention_policy, [ '^main$' ])
 
   # Ensure creation (or removal) of Barman files and directories
   $ensure_file = $ensure ? {
