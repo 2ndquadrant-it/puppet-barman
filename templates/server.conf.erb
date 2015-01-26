@@ -36,6 +36,9 @@ last_backup_maximum_age = <%= @last_backup_maximum_age %>
 <%- end -%>
 backup_options = <%= @backup_options %>
 minimum_redundancy = <%= @minimum_redundancy %>
+retention_policy = <%= @retention_policy %>
+retention_policy_mode = <%= @retention_policy_mode %>
+wal_retention_policy = <%= @wal_retention_policy %>
 <%- if @custom_lines -%>
 <%= @custom_lines %>
 <%- end -%>
