@@ -31,6 +31,9 @@ basebackup_retry_times = <%= @basebackup_retry_times %>
 <%- if @basebackup_retry_sleep != false -%>
 basebackup_retry_sleep = <%= @basebackup_retry_sleep %>
 <%- end -%>
+<%- if @last_backup_maximum_age != false -%>
+last_backup_maximum_age = <%= @last_backup_maximum_age %>
+<%- end -%>
 backup_options = <%= @backup_options %>
 minimum_redundancy = <%= @minimum_redundancy %>
 configuration_files_directory = /etc/barman.conf.d
