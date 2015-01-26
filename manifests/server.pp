@@ -51,6 +51,8 @@
 #                          (default.)
 # [*retention_policy_mode*] - Can only be set to auto (retention policies are automatically enforced by the barman cron command).
 #                           (default.)
+# [*reuse_backup*] - Incremental backup is a kind of full periodic backup which saves only data changes from the
+#                    latest full backup available in the catalogue for a specific PostgreSQL server. Disabled if false
 # [*custom_lines*] - Custom configuration directives (e.g. for custom
 #                    compression). Defaults to empty.
 #
@@ -104,6 +106,7 @@ define barman::server (
   $retention_policy        = '',
   $retention_policy_mode   = 'auto',
   $wal_retention_policy    = 'main',
+  $reuse_backup            = false,
   $custom_lines            = undef,
 ) {
 
@@ -143,6 +146,11 @@ define barman::server (
 
   # check to make sure wal_retention_policy is set to main
   validate_re($wal_retention_policy, [ '^main$' ])
+
+  # check to make sure reuse_backup has correct value
+  if $reuse_backup != false {
+    validate_re($reuse_backup, [ '^(off|link|copy)$' ])
+  }
 
   if $custom_lines != '' {
     notice 'The \'custom_lines\' option is deprecated. Please use $conf_template for custom configuration'
