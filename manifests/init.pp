@@ -162,7 +162,9 @@ class barman (
   }
   
   # Check to make sure last_backup_maximum_age identifies (DAYS | WEEKS | MONTHS) greater then 0
-  validate_re($last_backup_maximum_age, [ '^[1-9][0-9]* (DAYS|WEEKS|MONTHS)$' ])
+  if $last_backup_maximum_age != false {
+    validate_re($last_backup_maximum_age, [ '^[1-9][0-9]* (DAYS|WEEKS|MONTHS)$' ])
+  }
 
   # Check to make sure retention_policy has correct value
   validate_re($retention_policy, [ '^(^$|REDUNDANCY [1-9][0-9]*|RECOVERY WINDOW OF [1-9][0-9]* (DAYS|WEEKS|MONTHS))$' ])
