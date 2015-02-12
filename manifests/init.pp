@@ -34,13 +34,13 @@
 # [*basebackup_retry_sleep*] - Number of seconds to wait after after a failed copy, before retrying. Default = 30
 # [*backup_options*] - Behavior for backup operations: possible values are exclusive_backup (default)
 #                      and concurrent_backup
-# [*minimum_redundancy*] - Minimum number of required backups (redundancy). Default 0 
+# [*minimum_redundancy*] - Minimum number of required backups (redundancy). Default 0
 #                          (default).
 # [*last_backup_maximum_age*] - Time frame that must contain the latest backup date.
 #                               If the latest backup is older than the time frame, barman check
 #                               command will report an error to the user. Empty if false.
 #                             (default)
-# [*retention_policy*] - Base backup retention policy, based on redundancy or recovery window. 
+# [*retention_policy*] - Base backup retention policy, based on redundancy or recovery window.
 #                        Default empty (no retention enforced)
 #                        Value must be greater than or equal to the server minimum redundancy level
 #                        (if not is is assigned to that value and a warning is generated);
@@ -61,11 +61,7 @@
 # [*autoconfigure*] - This is the main parameter to enable the autoconfiguration
 #                     of the backup of a given PostgreSQL server. Its value is set
 #                     by 'settings' class.
-#
-# NOTE: 'log_file', 'compression', 'pre_backup_scripts', 'post_backup_scripts'
-#       and 'custom_lines' are not set by 'settings' class because they included
-#       into resources present both in Barman and PostgreSQL server, so they
-#       have to be configurable when the 'barman' resource is created.
+
 #
 # === Facts
 #
@@ -117,25 +113,25 @@ class barman (
   $ensure                  = 'present',
   $conf_template           = 'barman/barman.conf.erb',
   $logrotate_template      = 'barman/logrotate.conf.erb',
-  $home                    = $::barman::settings::home,
-  $logfile                 = '/var/log/barman/barman.log',
-  $compression             = 'gzip',
-  $immediate_checkpoint    = false,
-  $pre_backup_script       = false,
-  $post_backup_script      = false,
-  $pre_archive_script      = false,
-  $post_archive_scirpt     = false,
-  $basebackup_retry_times  = false,
-  $basebackup_retry_sleep  = false,
-  $backup_options          = 'exclusive_backup',
-  $minimum_redundancy      = '0',
-  $last_backup_maximum_age = false,
-  $retention_policy        = '',
-  $retention_policy_mode   = 'auto',
-  $wal_retention_policy    = 'main',
-  $reuse_backup            = false,
-  $custom_lines            = undef,
   $barman_fqdn             = $::fqdn,
+  $home                    = $::barman::settings::home,
+  $logfile                 = $::barman::settings::logfile,
+  $compression             = $::barman::settings::compression,
+  $immediate_checkpoint    = $::barman::settings::immediate_checkpoint,
+  $pre_backup_script       = $::barman::settings::pre_backup_script,
+  $post_backup_script      = $::barman::settings::post_backup_script,
+  $pre_archive_script      = $::barman::settings::pre_archive_script,
+  $post_archive_script     = $::barman::settings::post_archive_script,
+  $basebackup_retry_times  = $::barman::settings::basebackup_retry_times,
+  $basebackup_retry_sleep  = $::barman::settings::basebackup_retry_sleep,
+  $backup_options          = $::barman::settings::backup_options,
+  $minimum_redundancy      = $::barman::settings::minimum_redundancy,
+  $last_backup_maximum_age = $::barman::settings::last_backup_maximum_age,
+  $retention_policy        = $::barman::settings::retention_policy,
+  $retention_policy_mode   = $::barman::settings::retention_policy_mode,
+  $wal_retention_policy    = $::barman::settings::wal_retention_policy,
+  $reuse_backup            = $::barman::settings::reuse_backup,
+  $custom_lines            = $::barman::settings::custom_lines,
   $autoconfigure           = $::barman::settings::autoconfigure,
   $manage_package_repo     = $::barman::settings::manage_package_repo,
 ) inherits barman::settings {
@@ -160,7 +156,7 @@ class barman (
   if $basebackup_retry_sleep != false {
     validate_re($basebackup_retry_sleep, [ '^[0-9]+$' ])
   }
-  
+
   # Check to make sure last_backup_maximum_age identifies (DAYS | WEEKS | MONTHS) greater then 0
   if $last_backup_maximum_age != false {
     validate_re($last_backup_maximum_age, [ '^[1-9][0-9]* (DAYS|WEEKS|MONTHS)$' ])

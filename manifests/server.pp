@@ -92,22 +92,22 @@ define barman::server (
   $ensure                  = 'present',
   $conf_template           = 'barman/server.conf.erb',
   $description             = $name,
-  $compression             = false,
-  $immediate_checkpoint    = false,
-  $pre_backup_script       = false,
-  $post_backup_script      = false,
-  $pre_archive_script      = false,
-  $post_archive_scirpt     = false,
-  $basebackup_retry_times  = false,
-  $basebackup_retry_sleep  = false,
-  $backup_options          = 'exclusive_backup',
-  $minimum_redundancy      = '0',
-  $last_backup_maximum_age = false,
-  $retention_policy        = '',
-  $retention_policy_mode   = 'auto',
-  $wal_retention_policy    = 'main',
-  $reuse_backup            = false,
-  $custom_lines            = undef,
+  $compression             = $::barman::compression,
+  $immediate_checkpoint    = $::barman::immediate_checkpoint,
+  $pre_backup_script       = $::barman::pre_backup_script,
+  $post_backup_script      = $::barman::post_backup_script,
+  $pre_archive_script      = $::barman::pre_archive_script,
+  $post_archive_script     = $::barman::post_archive_script,
+  $basebackup_retry_times  = $::barman::basebackup_retry_times,
+  $basebackup_retry_sleep  = $::barman::basebackup_retry_sleep,
+  $backup_options          = $::barman::backup_options,
+  $minimum_redundancy      = $::barman::minimum_redundancy,
+  $last_backup_maximum_age = $::barman::last_backup_maximum_age,
+  $retention_policy        = $::barman::retention_policy,
+  $retention_policy_mode   = $::barman::retention_policy_mode,
+  $wal_retention_policy    = $::barman::wal_retention_policy,
+  $reuse_backup            = $::barman::reuse_backup,
+  $custom_lines            = $::barman::custom_lines,
 ) {
 
   # check if 'description' has been correctly configured
@@ -137,7 +137,7 @@ define barman::server (
 
   # check to make sure last_backup_maximum_age identifies (DAYS | WEEKS | MONTHS) greater then 0
   if $last_backup_maximum_age != false {
-    validate_re($last_backup_maximum_age, [ '^[1-9][0-9]* (DAYS|WEEKS|MONTHS)$' ]) 
+    validate_re($last_backup_maximum_age, [ '^[1-9][0-9]* (DAYS|WEEKS|MONTHS)$' ])
   }
 
   # check to make sure retention_policy has correct value
