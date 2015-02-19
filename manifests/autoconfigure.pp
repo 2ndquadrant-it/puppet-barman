@@ -38,7 +38,7 @@
 #
 class barman::autoconfigure (
   $host_group         = $::barman::settings::host_group,
-  $exported_ipaddress = $::ipaddress,
+  $exported_ipaddress = "${::ipaddress}/32",
 ) {
 
   # create the (empty) .pgpass file
@@ -96,7 +96,7 @@ class barman::autoconfigure (
     type        => 'host',
     database    => $barman::settings::dbname,
     user        => $barman::settings::dbuser,
-    address     => "${::exported_ipaddress}/32",
+    address     => $exported_ipaddress,
     auth_method => 'md5',
     tag         => "barman-${host_group}",
   }
