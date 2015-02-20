@@ -2,7 +2,8 @@
 
 ## Description
 
-This module manages the installation of Barman and the configuration of PostgreSQL servers to be backed up.
+This module manages the installation of Barman and the configuration of
+PostgreSQL servers to be backed up.
 
 For further information on Barman:
 
@@ -11,13 +12,13 @@ For further information on Barman:
 
 ## Installation
 
-The module can be installed automatically with the *puppet* command on the master, or manually by cloning the
-repository in your puppet module path.
+The module can be installed automatically with the *puppet* command on the
+master, or manually by cloning the repository in your puppet module path.
 
 ### Installing via puppet
 
-The latest version of the module can be installed automatically by supplying the repository information to
-the module installer:
+The latest version of the module can be installed automatically by supplying
+the repository information to the module installer:
 
     # puppet module install it2ndq-barman
 
@@ -25,18 +26,20 @@ This will take care of the dependencies as well.
 
 ### Installing manually
 
-If you choose to install manually, you will have to clone the repository in the module path.
+If you choose to install manually, you will have to clone the repository in the
+module path.
 
 ## Usage
 
 ### barman
 
-The `barman` class installs Barman. Currently only Ubuntu and Debian are supported.
+The `barman` class installs Barman. Currently only Ubuntu and Debian are
+supported.
 
 Intensive testing has only been done on Ubuntu 12.04 LTS.
 
-In order to install Barman with the defaults option, it is sufficient to just include the
-barman class:
+In order to install Barman with the default options, it is sufficient to just
+include the barman class:
 
     class { 'barman': }
 
@@ -53,7 +56,10 @@ module.
     }->
     class { 'barman': }
 
-All the configuration options that Barman accepts can be overridden from the package defaults.
+**Note:** In versions of `it2ndq/barman' > 2.1, setup of PGDG is done
+automatically if the `manage_package_repo` parameter is set to `true`.
+
+All the configuration options that Barman accepts can be defined through Puppet.
 
 Example usage:
 
@@ -62,64 +68,117 @@ Example usage:
       compression        => 'bzip2',
       pre_backup_script  => '/usr/bin/touch /tmp/started',
       post_backup_script => '/usr/bin/touch /tmp/stopped',
-      custom_lines       => '; something'
     }
 
 #### Parameters
 
-* **logfile** - A different log file. The default is '/var/log/barman/barman.log'
-* **compression** - Compression algorithm. Currently supports 'gzip' (default),
-                    'bzip2', and 'custom'. Disabled if false.
-* **pre_backup_script** - Script to launch before backups. Disabled if false
-                          (default).
-* **post_backup_script** - Script to launch after backups. Disabled if false
-                           (default).
-* **custom_lines** - Custom configuration directives (e.g. for custom
-                     compression). Defaults to empty.
+Parameters can be set in three places:
 
-See the **init.pp** file for more details.
+* **barman::settings** - set the default values for the manifest.
+* **barman** - set the global values for the Barman server.
+* **barman::server** - set the per PostgreSQL server values.
+
+These are the available parameters for the `barman` class
+
+* **user** - The Barman user. Defaults to `barman::settings::user`.
+* **group** - The group of the Barman user. Defaults to
+              `barman::settings::group`.
+* **ensure** - Ensure that Barman is installed. The default value is `present`.
+* **conf_template** - Path of the template for the `barman.conf` configuration
+                      file. You may change this value to use a custom template.
+* **logrotate_template** - Path of the template for the `logrotate.conf` file.
+                           You may change this value to use a custom template.
+* **home** - A different location for backups than the default. Will be
+            symlinked to the default (`/var/lib/barman`). You should not change
+            this value after the first setup. Defaults to
+            `barman::settings::home`.
+* **logfile** - A different log file. The default is
+                `barman::settings::logfile`.
+* **compression** - Compression algorithm. Currently supports 'gzip', 'bzip2',
+                    and 'custom'. Defaults to `barman::settings:compression`.
+* **immediate_checkpoint** -  Force the checkpoint on the Postgres server to
+                              happen immediately and start your backup copy
+                              process as soon as possible. Disabled if false.
+                              Defaults to
+                              `barman::settings::immediate_checkpoint`
+* **pre_backup_script** - Script to run before backups. Disabled if false.
+                          Defaults to `barman::settings::pre_backup_script`.
+* **post_backup_script** - Script to run after backups. Disabled if false.
+                           Defaults to `barman::settings::post_backup_script`.
+* **pre_archive_script** - Script to run before a WAL file is archived by
+                           maintenance. Disabled if false.
+                           Defaults to `barman::settings::pre_archive_script`.
+* **post_archive_script** - Script to run after a WAL file is archived by
+                            maintenance. Disabled if false.
+                            Defaults to `barman::settings::post_archive_script`.
+* **basebackup_retry_times** - Number of retries for data copy during base
+                               backup after an error. Defaults to
+                               `barman::settings::basebackup_retry_times`
+* **basebackup_retry_sleep** - Number of seconds to wait after a failed
+                               copy, before retrying. Defaults to
+                               `barman::settings::basebackup_retry_sleep`
+* **backup_options** - Behaviour for backup operations: possible values are
+                       'exclusive_backup' and 'concurrent_backup'. Defaults to
+                      `barman::settings::backup_options`.
+* **minimum_redundancy** - Minimum number of required backups (redundancy).
+                           Defaults to `barman::settings::minimum_redundancy`.
+* **last_backup_maximum_age** - Time frame in which the latest backup date must
+                                be contained. If the latest backup is older
+                                than the time frame, `barman check` command
+                                will report an error to the user. Empty if
+                                false. Defaults to
+                                `barman::settings::last_backup_maximum_age`.
+* **retention_policy** - Base backup retention policy, based on redundancy or
+                         recovery window. Value must be greater than or equal
+                         to the server minimum redundancy level. If this
+                         condition is not satistied, the minimum redundancy
+                         value is assigned to this parameter. Defaults to
+                         `barman::settings::retention_policy`.
+* **wal_retention_policy** - WAL archive logs retention policy. Currently, the
+                             only allowed value for `wal_retention_policy` is
+                             the special value 'main', that maps the retention
+                             policy of archive logs to that of base backups.
+                             Defaults to
+                             `barman::settings::wal_retention_policy`.
+* **retention_policy_mode** - Can only be set to 'auto' (retention policies are
+                              automatically enforced by the `barman cron`
+                              command). Defaults to
+                              `barman::settings::retention_policy_mode`.
+* **reuse_backup** - Incremental backup is a kind of full periodic backup which
+                     saves only data changes from the latest full backup
+                     available in the catalogue for a specific PostgreSQL
+                     server. Disabled if false. Available values are
+                     'off', 'link' and 'copy'. Defaults to
+                     `barman::settings::reuse_backup`.
+* **custom_lines** - Custom configuration directives (e.g. for custom
+                    compression). Defaults to `barman::settings::custom_lines`.
+* **barman_fqdn** - The fully qualified domain name of the Barman server. It is
+                    exported in several resources in the PostgreSQL server.
+                    Puppet automatically set this.
+* **autoconfigure** - This is the main parameter to enable the autoconfiguration
+                     of the backup of a given PostgreSQL server.
+                     Defaults to `barman::settings::autoconfigure`.
+
+See the file **init.pp** for more details.
 
 #### Facts
 
 The module generates a fact called **barman_key** which has the content of
 **/var/lib/barman/.ssh/id_rsa.pub**, in order to automatically handle the
-key exchange on the postgres server via puppetdb.
+key exchange on the Postgres server via puppetdb.
 
 If the file doesn't exist, a key will be generated.
 
 ### barman::settings
 
-The barman::settings class set the configuration parameters to set up Barman
-server. Here are included parameters specifically for Barman that are not shared
-for other resources, such as PostgreSQL server (in this case the rest of the
-parameters can be set as it was shown above when a Barman instance is defined).
+The barman::settings class holds the default configuration parameters to set up
+a Barman server through Puppet.
 
-See the **settings.pp** file for more details.
-
-#### Parameters
-
-* **user** - The Barman user. The default value is 'barman'.
-* **group** - The group of the Barman user. The default
-              value is 'barman'.
-* **dbuser** - The user used by Barman to connect to
-               PostgreSQL database(s). It will be used to
-               build the 'conninfo' Barman parameter.
-               The default value is 'barman', and will be
-               the same for all the PostgreSQL servers.
-* **dbname** - The database where Barman can connect. It will
-               be used to build the 'conninfo' Barman parameter.
-               The default one is the 'postgres' database.
-* **home** - The Barman user home directory. The default
-             value is '/var/lib/barman', but it can be changed
-             depending on the operating system.
-* **autoconfigure** - This is the main parameter to enable the
-                      autoconfiguration of the backup of a
-                      given PostgreSQL server performed by
-                      Barman.
+See the file **settings.pp** for more details.
 
 ### barman::server
 
-The barman::server class configures barman to handle backups for a PostgreSQL server.
+The barman::server class sets the per server Barman configuration parameters.
 
 The only required parameters are **conninfo** and **ssh_command**.
 
@@ -140,7 +199,6 @@ Example:
       compression        => 'bzip2',
       pre_backup_script  => '/usr/bin/touch /tmp/started',
       post_backup_script => '/usr/bin/touch /tmp/stopped',
-      custom_lines       => '; something'
     }
 
 **Note**: it is not recommended to specify passwords in the `conninfo`
@@ -150,37 +208,41 @@ file instead (known as `~/.pgpass` file).
 #### Parameters
 
 Many of the main configuration parameters can be passed in order to
-perform overrides.
+perform overrides of the global settings. The default values for these
+parameters are copied from the ones in `barman` class.
+
+The following parameters are unique to the `server` class:
 
 * **conninfo** - Postgres connection string. **Mandatory**.
-* **ssh_command** - Command to open an ssh connection to Postgres. **Mandatory**.
-* **compression** - Compression algorithm. Uses the global configuration
-                   if false (default).
-* **pre_backup_script** - Script to launch before backups. Uses the global
-                          configuration if false (default).
-* **post_backup_script** - Script to launch after backups. Uses the global
-                          configuration if false (default).
-* **custom_lines** - Custom configuration directives (e.g. for custom
-                     compression). Defaults to empty.
+* **ssh_command** - Command to open an ssh connection to Postgres.
+                    **Mandatory**.
+* **ensure** - Ensure the configuration file for the server is present.
+               Available values are 'present' and 'absent'. Default: 'present'. 
+* **conf_template** - Path of the template for the `server.conf` configuration
+                      file. You may change this value to use a custom template.
+* **description** - A description that will be written in the configuration
+                    file. Defaults to the name of the resource.
+
+See the file **server.pp** for more details.
 
 ## Autoconfiguration
 
-It is possible to enable the `barman` Puppet module to automatically configure the
-Barman server to back up a given PostgreSQL server. It is also possible the
-configuration of more than one PostgreSQL server to be backed up, and moreover it
-is possible to create many "host groups" when a Barman Server (in each group) can
-back up one or more PostgreSQL servers.
+It is possible to enable the `barman` Puppet module to automatically configure
+the Barman server to back up a given PostgreSQL server. It is also possible for 
+more than one PostgreSQL server to be backed up, and moreover it is possible to
+create many "host groups" whose PostgreSQL servers a Barman Server in each group
+can back up.
 
 ### Enabling autoconfigure
 
-The parameter **barman::settings::autoconfigure** in the **barman** class enables
-the inclusion of the Puppet classes involved in the autoconfiguration. The default
-value is 'false'.
+The parameter **barman::settings::autoconfigure** in the **barman** class
+enables the inclusion of the Puppet classes involved in the autoconfiguration.
+The default value is 'false'.
 
-The parameter **barman::settings::host_group** in the **barman** class is used to
-create different host groups. If the same value for this parameter is used for more
-than a PostgreSQL server, these servers and the Barman server belong to the
-same backup cluster ("host group").
+The parameter **barman::settings::host_group** in the **barman** class is used
+to create different host groups. If the same value for this parameter is used
+for more than a PostgreSQL server, these servers and the Barman server belong
+to the same backup cluster ("host group").
 
 Those are the classes involved when autoconfiguration is enabled:
 
@@ -189,22 +251,23 @@ Those are the classes involved when autoconfiguration is enabled:
 This class:
 
 * Creates the `~/.pgpass` file for the `barman` user
-* Imports resources exported by the PostgreSQL server (crontab for the backup, PostgreSQL
-superuser SSH key, `.pgpass` file, configuration of the single PostgreSQL server in Barman)
-* Exports Barman resources to the PostgreSQL server (*archive_command*, Barman user SSH key,
-configurations for the *pg_hba.conf* file)
+* Imports resources exported by the PostgreSQL server (crontab for the backup,
+PostgreSQL superuser SSH key, `.pgpass` file, configuration of the single
+PostgreSQL server in Barman)
+* Exports Barman resources to the PostgreSQL server (`archive_command`, Barman
+user SSH key, configurations for the `pg_hba.conf` file)
 
 More details in the **autoconfigure.pp** file.
 
 #### Parameters
 
 * **host_group** - Tag the different host groups for the backup
-                   (default value is set from the 'settings' class).
+                   (default value is set from the `settings` class).
 
 ### barman::postgres
 
 This class exports resources to the Barman server (Barman configurations,
-cron, SSH key) and imports resources from it (configures *archive_mode*,
+cron, SSH key) and imports resources from it (configures `archive_mode`,
 defines the `user` used by Barman to connect into the PostgreSQL databases). It
 has to be included in the PostgreSQL server.
 
@@ -241,7 +304,7 @@ More details in the **postgres.pp** file.
 
 ## License
 
-This module is distributed under GNU GPLv3
+This module is distributed under GNU GPLv3.
 
 ## Author
 
