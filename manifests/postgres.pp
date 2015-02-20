@@ -66,7 +66,7 @@
 #
 # === Copyright
 #
-# Copyright 2012-2014 2ndQuadrant Italia (Devise.IT SRL)
+# Copyright 2012-2015 2ndQuadrant Italia (Devise.IT SRL)
 #
 class barman::postgres (
   $host_group     = $::barman::settings::host_group,

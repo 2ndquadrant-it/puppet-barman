@@ -260,4 +260,4 @@ on Puppet and the ideas he brought to this module.
 
 ### Copyright
 
-Copyright 2012-2014 2ndQuadrant Italia (Devise.IT SRL)
+Copyright 2012-2015 2ndQuadrant Italia (Devise.IT SRL)
