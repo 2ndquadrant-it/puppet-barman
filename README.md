@@ -217,7 +217,7 @@ The following parameters are unique to the `server` class:
 * **ssh_command** - Command to open an ssh connection to Postgres.
                     **Mandatory**.
 * **ensure** - Ensure the configuration file for the server is present.
-               Available values are 'present' and 'absent'. Default: 'present'. 
+               Available values are 'present' and 'absent'. Default: 'present'.
 * **conf_template** - Path of the template for the `server.conf` configuration
                       file. You may change this value to use a custom template.
 * **description** - A description that will be written in the configuration
@@ -228,7 +228,7 @@ See the file **server.pp** for more details.
 ## Autoconfiguration
 
 It is possible to enable the `barman` Puppet module to automatically configure
-the Barman server to back up a given PostgreSQL server. It is also possible for 
+the Barman server to back up a given PostgreSQL server. It is also possible for
 more than one PostgreSQL server to be backed up, and moreover it is possible to
 create many "host groups" whose PostgreSQL servers a Barman Server in each group
 can back up.
