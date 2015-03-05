@@ -120,7 +120,7 @@ class barman::postgres (
   }
 
   # Export resources to Barman server
-  @@barman::server { $::hostname:
+  @@barman::server { $postgres_server_id:
     conninfo    => "user=${barman_dbuser} dbname=${barman_dbname} host=${server_address}",
     ssh_command => "ssh ${postgres_user}@${server_address}",
     tag         => "barman-${host_group}",
