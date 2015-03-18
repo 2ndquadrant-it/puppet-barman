@@ -8,13 +8,13 @@
 #
 # [*host_group*] - Tag the different host groups for the backup
 #                  (default value is set from the 'settings' class).
-# [*wal_level*] - Configuration of the 'wal_level' parameter in the postgresql.conf
-#                 file. The default value is 'archive'.
-# [*barman_user*] - Definition of the 'barman' user used in Barman 'conninfo'. The
-#                   default value is set from the 'settings' class.
+# [*wal_level*] - Configuration of the 'wal_level' parameter in the
+#                 postgresql.conf file. The default value is 'archive'.
+# [*barman_user*] - Definition of the 'barman' user used in Barman 'conninfo'.
+#                   The default value is set from the 'settings' class.
 # [*barman_dbuser*] - Definition of the user used by Barman to connect to the
-#                     PostgreSQL database(s) in the 'conninfo'. The default value is
-#                     set from the 'settings' class.
+#                     PostgreSQL database(s) in the 'conninfo'. The default
+#                     value is set from the 'settings' class.
 # [*barman_home*] - Definition of the barman home directory. The default value
 #                   is set from the 'settings' class.
 # [*backup_mday*] - Day of the month set in the cron for the backup schedule.
@@ -23,10 +23,11 @@
 #                   The default value (undef) ensure daily backups.
 # [*backup_hour*] - Hour set in the cron for the backup schedule. The default
 #                   value is 04:XXam.
-# [*backup_minute*] - Minute set in the cron for the backup schedule. The default
-#                     value is for XX:00am
+# [*backup_minute*] - Minute set in the cron for the backup schedule. The
+#                     default value is for XX:00am
 # [*password*] - Password used by Barman to connect to PosgreSQL. The default
-#                value (empty string) allows the generation of a random password.
+#                value (empty string) allows the generation of a random
+#                password.
 # [*server_address*] - The whole fqdn of the PostgreSQL server used in Barman
 #                      'ssh_command' (automatically configured by Puppet).
 # [*postgres_server_id*] - Id of the PostgreSQL server, given by its host name
@@ -83,6 +84,25 @@ class barman::postgres (
   $server_address = $::fqdn,
   $postgres_server_id = $::hostname,
   $postgres_user      = 'postgres',
+  $ensure                  = 'present',
+  $conf_template           = 'barman/server.conf.erb',
+  $description             = $name,
+  $compression             = $::barman::compression,
+  $immediate_checkpoint    = $::barman::immediate_checkpoint,
+  $pre_backup_script       = $::barman::pre_backup_script,
+  $post_backup_script      = $::barman::post_backup_script,
+  $pre_archive_script      = $::barman::pre_archive_script,
+  $post_archive_script     = $::barman::post_archive_script,
+  $basebackup_retry_times  = $::barman::basebackup_retry_times,
+  $basebackup_retry_sleep  = $::barman::basebackup_retry_sleep,
+  $backup_options          = $::barman::backup_options,
+  $minimum_redundancy      = $::barman::minimum_redundancy,
+  $last_backup_maximum_age = $::barman::last_backup_maximum_age,
+  $retention_policy        = $::barman::retention_policy,
+  $retention_policy_mode   = $::barman::retention_policy_mode,
+  $wal_retention_policy    = $::barman::wal_retention_policy,
+  $reuse_backup            = $::barman::reuse_backup,
+  $custom_lines            = $::barman::custom_lines,
 ) inherits ::barman::settings {
 
   unless defined(Class['postgresql::server']) {
@@ -121,9 +141,25 @@ class barman::postgres (
 
   # Export resources to Barman server
   @@barman::server { $postgres_server_id:
-    conninfo    => "user=${barman_dbuser} dbname=${barman_dbname} host=${server_address}",
-    ssh_command => "ssh ${postgres_user}@${server_address}",
-    tag         => "barman-${host_group}",
+    conninfo                => "user=${barman_dbuser} dbname=${barman_dbname} host=${server_address}",
+    ssh_command             => "ssh ${postgres_user}@${server_address}",
+    tag                     => "barman-${host_group}",
+    compression             => $compression,
+    immediate_checkpoint    => $immediate_checkpoint,
+    pre_backup_script       => $pre_backup_script,
+    post_backup_script      => $post_backup_script,
+    pre_archive_script      => $pre_archive_script,
+    post_archive_script     => $post_archive_script,
+    basebackup_retry_times  => $basebackup_retry_times,
+    basebackup_retry_sleep  => $basebackup_retry_sleep,
+    backup_options          => $backup_options,
+    minimum_redundancy      => $minimum_redundancy,
+    last_backup_maximum_age => $last_backup_maximum_age,
+    retention_policy        => $retention_policy,
+    retention_policy_mode   => $retention_policy_mode,
+    wal_retention_policy    => $wal_retention_policy,
+    reuse_backup            => $reuse_backup,
+    custom_lines            => $custom_lines,
   }
 
   @@cron { "barman_backup_${::hostname}":
