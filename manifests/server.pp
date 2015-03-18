@@ -6,56 +6,61 @@
 #
 # === Parameters
 #
-# Many of the main configuration parameters can ( and *must*) be passed in order to
-#  perform overrides.
+# Many of the main configuration parameters can ( and *must*) be passed in
+# order to perform overrides.
 #
 # [*conninfo*] - Postgres connection string. *Mandatory*.
 # [*ssh_command*] - Command to open an ssh connection to Postgres. *Mandatory*.
 # [*ensure*] - Ensure (or not) that single server Barman configuration files are
-#              created. The default value is 'present'. Just 'absent' or 'present'
-#              are the possible settings.
-# [*conf_template*] - path of the template file to build the Barman configuration
-#                     file (the default value does not need to be changed).
+#              created. The default value is 'present'. Just 'absent' or
+#              'present' are the possible settings.
+# [*conf_template*] - path of the template file to build the Barman
+#                     configuration file.
 # [*description*] - Description of the configuration file: it is automatically
 #                   set when the resource is used.
-# [*compression*] - Compression algorithm. Uses the global configuration
-#                   if false (default).
-# [*pre_backup_script*] - Script to launch before backups. Uses the global
-#                         configuration if false (default).
-# [*post_backup_script*] - Script to launch after backups. Uses the global
-#                         configuration if false (default).
-# [*immediate_checkpoint*] -  Force the checkpoint on the Postgres server to happen immediately and start your backup copy process as soon as possible. Disabled if false
-#                          (default.)
-# [*pre_archive_script*] - Script to launch before a WAL file is archived by maintenance. Disabled if false
+# [*compression*] - Compression algorithm. Currently supports 'gzip' (default),
+#                   'bzip2', and 'custom'. Disabled if false.
+# [*pre_backup_script*] - Script to launch before backups. Disabled if false
+#                         (default).
+# [*post_backup_script*] - Script to launch after backups. Disabled if false
 #                          (default).
-# [*post_archive_script*] - Script to launch after a WAL file is archived by maintenance. Disabled if false
-#                          (default).
-# [*basebackup_retry_times*] - Number of retries fo data copy during base backup after an error. Default = 0
-# [*basebackup_retry_sleep*] - Number of seconds to wait after after a failed copy, before retrying. Default = 30
-# [*backup_options*] - Behavior for backup operations: possible values are exclusive_backup (default)
-#                      and concurrent_backup
-# [*minimum_redundancy*] - Minimum number of required backups (redundancy). Default 0
-#                          (default).
-# [*last_backup_maximum_age*] - Time frame that must contain the latest backup date.
-#                               If the latest backup is older than the time frame, barman check
-#                               command will report an error to the user. Empty if false.
-#                             (default)
-# [*retention_policy*] - Base backup retention policy, based on redundancy or recovery window.
-#                        Default empty (no retention enforced)
-#                        Value must be greater than or equal to the server minimum redundancy level
-#                        (if not is is assigned to that value and a warning is generated);
-#                      (default.)
-# [*wal_retention_policy*] - WAL archive logs retention policy. Currently, the only allowed value for
-#                            wal_retention_policy is the special value main, that maps the retention
-#                            policy of archive logs to that of base backups.
-#                          (default.)
-# [*retention_policy_mode*] - Can only be set to auto (retention policies are automatically enforced by the barman cron command).
-#                           (default.)
-# [*reuse_backup*] - Incremental backup is a kind of full periodic backup which saves only data changes from the
-#                    latest full backup available in the catalogue for a specific PostgreSQL server. Disabled if false
+# [*pre_archive_script*] - Script to launch before a WAL file is archived by
+#                          maintenance. Disabled if false (default).
+# [*post_archive_script*] - Script to launch after a WAL file is archived by
+#                          maintenance. Disabled if false (default).
+# [*immediate_checkpoint*] - Force the checkpoint on the Postgres server to
+#                            happen immediately and start your backup copy
+#                            process as soon as possible. Disabled if false
+#                           (default)
+# [*basebackup_retry_times*] - Number of retries fo data copy during base
+#                              backup after an error. Default = 0
+# [*basebackup_retry_sleep*] - Number of seconds to wait after after a failed
+#                              copy, before retrying. Default = 30
+# [*backup_options*] - Behavior for backup operations: possible values are
+#                      exclusive_backup (default) and concurrent_backup
+# [*minimum_redundancy*] - Minimum number of required backups (redundancy).
+#                          Default = 0
+# [*last_backup_maximum_age*] - Time frame that must contain the latest backup
+#                               date. If the latest backup is older than the
+#                               time frame, barman check command will report an
+#                               error to the user. Empty if false (default).
+# [*retention_policy*] - Base backup retention policy, based on redundancy or
+#                        recovery window. Default empty (no retention enforced).
+#                        Value must be greater than or equal to the server
+#                        minimum redundancy level (if not is is assigned to
+#                        that value and a warning is generated).
+# [*wal_retention_policy*] - WAL archive logs retention policy. Currently, the
+#                            only allowed value for wal_retention_policy is the
+#                            special value main, that maps the retention policy
+#                            of archive logs to that of base backups.
+# [*retention_policy_mode*] - Can only be set to auto (retention policies are
+#                             automatically enforced by the barman cron command)
+# [*reuse_backup*] - Incremental backup is a kind of full periodic backup which
+#                    saves only data changes from the latest full backup
+#                    available in the catalogue for a specific PostgreSQL
+#                    server. Disabled if false. Default false.
 # [*custom_lines*] - Custom configuration directives (e.g. for custom
-#                    compression). Defaults to empty.
-#
+#                    compression). Defaults to empty.#
 # === Examples
 #
 #  barman::server { 'main':
