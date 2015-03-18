@@ -2,13 +2,13 @@
 #
 # This class:
 #
-# * Create the .pgpass file for the 'barman' user
-# * Import resources exported by PostgreSQL server
+# * Creates the .pgpass file for the 'barman' user
+# * Imports resources exported by PostgreSQL server
 # ** to set cron
 # ** to import SSH key of 'postgres' user
 # ** to fill the .pgpass file
 # ** to configure Barman (fill .conf files)
-# * Export Barman resources to the PostgreSQL server
+# * Exports Barman resources to the PostgreSQL server
 # ** to set the 'archive_command' in postgresql.conf
 # ** to export the SSH key of 'barman' user
 # ** to configure the pg_hba.conf
@@ -17,6 +17,8 @@
 #
 # [*host_group*] - Tag the different host groups for the backup
 #                  (default value is set from the 'settings' class).
+# [*exported_ipaddress*] - The barman server address to allow in the PostgreSQL
+#                          server ph_hba.conf. Defaults to "${::ipaddress}/32".
 #
 # === Authors
 #
@@ -57,7 +59,6 @@ class barman::autoconfigure (
 
   # Import all needed information for the 'server' class
   Barman::Server <<| tag == "barman-${host_group}" |>> {
-    #    barman_user => $::barman::settings::dbuser,
     require     => Class['barman'],
   }
 
