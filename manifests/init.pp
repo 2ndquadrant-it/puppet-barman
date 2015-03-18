@@ -17,50 +17,62 @@
 #            to the default (/var/lib/barman). You should not change this
 #            value after the first setup. Its value is set by the 'settings'
 #            class.
-# [*logfile*] - A different log file. The default is '/var/log/barman/barman.log'
+# [*logfile*] - A different log file. The default is
+#               '/var/log/barman/barman.log'
 # [*compression*] - Compression algorithm. Currently supports 'gzip' (default),
 #                   'bzip2', and 'custom'. Disabled if false.
 # [*pre_backup_script*] - Script to launch before backups. Disabled if false
 #                         (default).
 # [*post_backup_script*] - Script to launch after backups. Disabled if false
 #                          (default).
-# [*pre_archive_script*] - Script to launch before a WAL file is archived by maintenance. Disabled if false
-#                          (default).
-# [*post_archive_script*] - Script to launch after a WAL file is archived by maintenance. Disabled if false
-#                          (default).
-# [*immediate_checkpoint*] -  Force the checkpoint on the Postgres server to happen immediately and start your backup copy process as soon as possible. Disabled if false
-#                          (default.)
-# [*basebackup_retry_times*] - Number of retries fo data copy during base backup after an error. Default = 0
-# [*basebackup_retry_sleep*] - Number of seconds to wait after after a failed copy, before retrying. Default = 30
-# [*backup_options*] - Behavior for backup operations: possible values are exclusive_backup (default)
-#                      and concurrent_backup
-# [*minimum_redundancy*] - Minimum number of required backups (redundancy). Default 0
-#                          (default).
-# [*last_backup_maximum_age*] - Time frame that must contain the latest backup date.
-#                               If the latest backup is older than the time frame, barman check
-#                               command will report an error to the user. Empty if false.
-#                             (default)
-# [*retention_policy*] - Base backup retention policy, based on redundancy or recovery window.
-#                        Default empty (no retention enforced)
-#                        Value must be greater than or equal to the server minimum redundancy level
-#                        (if not is is assigned to that value and a warning is generated);
-#                      (default.)
-# [*wal_retention_policy*] - WAL archive logs retention policy. Currently, the only allowed value for
-#                            wal_retention_policy is the special value main, that maps the retention
-#                            policy of archive logs to that of base backups.
-#                          (default.)
-# [*retention_policy_mode*] - Can only be set to auto (retention policies are automatically enforced by the barman cron command).
-#                           (default.)
-# [*reuse_backup*] - Incremental backup is a kind of full periodic backup which saves only data changes from the
-#                    latest full backup available in the catalogue for a specific PostgreSQL server. Disabled if false
+# [*pre_archive_script*] - Script to launch before a WAL file is archived by
+#                          maintenance. Disabled if false (default).
+# [*post_archive_script*] - Script to launch after a WAL file is archived by
+#                          maintenance. Disabled if false (default).
+# [*immediate_checkpoint*] - Force the checkpoint on the Postgres server to
+#                            happen immediately and start your backup copy
+#                            process as soon as possible. Disabled if false
+#                           (default)
+# [*basebackup_retry_times*] - Number of retries fo data copy during base
+#                              backup after an error. Default = 0
+# [*basebackup_retry_sleep*] - Number of seconds to wait after after a failed
+#                              copy, before retrying. Default = 30
+# [*backup_options*] - Behavior for backup operations: possible values are
+#                      exclusive_backup (default) and concurrent_backup
+# [*minimum_redundancy*] - Minimum number of required backups (redundancy).
+#                          Default = 0
+# [*last_backup_maximum_age*] - Time frame that must contain the latest backup
+#                               date. If the latest backup is older than the
+#                               time frame, barman check command will report an
+#                               error to the user. Empty if false (default).
+# [*retention_policy*] - Base backup retention policy, based on redundancy or
+#                        recovery window. Default empty (no retention enforced).
+#                        Value must be greater than or equal to the server
+#                        minimum redundancy level (if not is is assigned to
+#                        that value and a warning is generated).
+# [*wal_retention_policy*] - WAL archive logs retention policy. Currently, the
+#                            only allowed value for wal_retention_policy is the
+#                            special value main, that maps the retention policy
+#                            of archive logs to that of base backups.
+# [*retention_policy_mode*] - Can only be set to auto (retention policies are
+#                             automatically enforced by the barman cron command)
+# [*reuse_backup*] - Incremental backup is a kind of full periodic backup which
+#                    saves only data changes from the latest full backup
+#                    available in the catalogue for a specific PostgreSQL
+#                    server. Disabled if false. Default false.
 # [*custom_lines*] - Custom configuration directives (e.g. for custom
 #                    compression). Defaults to empty.
-# [*barman_fqdn*] - The fqdn of the Barman server. It will be exported in several
-#                   resources in the PostgreSQL server. Puppet automatically set
-#                    this.
-# [*autoconfigure*] - This is the main parameter to enable the autoconfiguration
-#                     of the backup of a given PostgreSQL server. Its value is set
-#                     by 'settings' class.
+# [*barman_fqdn*] - The fqdn of the Barman server. It will be exported in
+#                   several resources in the PostgreSQL server. Puppet
+#                   automatically set this.
+# [*autoconfigure*] - This is the main parameter to enable the
+#                     autoconfiguration of the backup of a given PostgreSQL
+#                     server. Defaults to false.
+# [*exported_ipaddress*] - The ipaddress exported to the PostgreSQL server
+#                          during atutoconfiguration. Defaults to
+#                          "${::ipaddress}/32".
+# [*host_group*] -  Tag used to collect and export resources during
+#                   autoconfiguration. Defaults to 'global'.
 
 #
 # === Facts
@@ -77,8 +89,7 @@
 #  include barman
 # ---
 #
-# All parameters that are supported by barman (not configured by the 'barman' class)
-# can be changed:
+# All parameters that are supported by barman can be changed:
 # ---
 #  class { barman:
 #    logfile  => '/var/log/barman/something_else.log',
@@ -134,6 +145,8 @@ class barman (
   $custom_lines            = $::barman::settings::custom_lines,
   $autoconfigure           = $::barman::settings::autoconfigure,
   $manage_package_repo     = $::barman::settings::manage_package_repo,
+  $exported_ipaddress      = "${::ipaddress}/32",
+  $host_group              = $::barman::settings::host_group,
 ) inherits barman::settings {
 
   # Check if autoconfigure is a boolean
@@ -239,6 +252,9 @@ class barman (
 
   # Set the autoconfiguration
   if $autoconfigure {
-    include ::barman::autoconfigure
+    class { '::barman::autoconfigure':
+      exported_ipaddress => $exported_ipaddress,
+      host_group         => $host_group,
+      }
   }
 }
