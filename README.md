@@ -94,8 +94,8 @@ These are the available parameters for the `barman` class
             `barman::settings::home`.
 * **logfile** - A different log file. The default is
                 `barman::settings::logfile`.
-* **compression** - Compression algorithm. Currently supports 'gzip', 'bzip2',
-                    and 'custom'. Defaults to `barman::settings:compression`.
+* **compression** - Compression algorithm. Currently supports `gzip`, `bzip2`,
+                    and `custom`. Defaults to `barman::settings:compression`.
 * **immediate_checkpoint** -  Force the checkpoint on the Postgres server to
                               happen immediately and start your backup copy
                               process as soon as possible. Disabled if false.
@@ -118,7 +118,7 @@ These are the available parameters for the `barman` class
                                copy, before retrying. Defaults to
                                `barman::settings::basebackup_retry_sleep`
 * **backup_options** - Behaviour for backup operations: possible values are
-                       'exclusive_backup' and 'concurrent_backup'. Defaults to
+                       `exclusive_backup` and `concurrent_backup`. Defaults to
                       `barman::settings::backup_options`.
 * **minimum_redundancy** - Minimum number of required backups (redundancy).
                            Defaults to `barman::settings::minimum_redundancy`.
@@ -136,11 +136,11 @@ These are the available parameters for the `barman` class
                          `barman::settings::retention_policy`.
 * **wal_retention_policy** - WAL archive logs retention policy. Currently, the
                              only allowed value for `wal_retention_policy` is
-                             the special value 'main', that maps the retention
+                             the special value `main`, that maps the retention
                              policy of archive logs to that of base backups.
                              Defaults to
                              `barman::settings::wal_retention_policy`.
-* **retention_policy_mode** - Can only be set to 'auto' (retention policies are
+* **retention_policy_mode** - Can only be set to `auto` (retention policies are
                               automatically enforced by the `barman cron`
                               command). Defaults to
                               `barman::settings::retention_policy_mode`.
@@ -148,16 +148,22 @@ These are the available parameters for the `barman` class
                      saves only data changes from the latest full backup
                      available in the catalogue for a specific PostgreSQL
                      server. Disabled if false. Available values are
-                     'off', 'link' and 'copy'. Defaults to
+                     `off`, `link` and `copy`. Defaults to
                      `barman::settings::reuse_backup`.
-* **custom_lines** - Custom configuration directives (e.g. for custom
-                    compression). Defaults to `barman::settings::custom_lines`.
+* **custom_lines** - DEPRECATED. Custom configuration directives (e.g. for
+                     custom compression). Defaults to
+                     `barman::settings::custom_lines`.
 * **barman_fqdn** - The fully qualified domain name of the Barman server. It is
                     exported in several resources in the PostgreSQL server.
                     Puppet automatically set this.
 * **autoconfigure** - This is the main parameter to enable the autoconfiguration
                      of the backup of a given PostgreSQL server.
                      Defaults to `barman::settings::autoconfigure`.
+* **exported_ipaddress** - The ipaddress exported to the PostgreSQL server
+                           during atutoconfiguration. Defaults to
+                           `${::ipaddress}/32`.
+* **host_group** -  Tag used to collect and export resources during
+                    autoconfiguration. Defaults to `global`.
 
 See the file **init.pp** for more details.
 
@@ -171,14 +177,14 @@ If the file doesn't exist, a key will be generated.
 
 ### barman::settings
 
-The barman::settings class holds the default configuration parameters to set up
+The `barman::settings` class holds the default configuration parameters to set up
 a Barman server through Puppet.
 
 See the file **settings.pp** for more details.
 
 ### barman::server
 
-The barman::server class sets the per server Barman configuration parameters.
+The `barman::server` class sets the per server Barman configuration parameters.
 
 The only required parameters are **conninfo** and **ssh_command**.
 
@@ -217,11 +223,55 @@ The following parameters are unique to the `server` class:
 * **ssh_command** - Command to open an ssh connection to Postgres.
                     **Mandatory**.
 * **ensure** - Ensure the configuration file for the server is present.
-               Available values are 'present' and 'absent'. Default: 'present'.
+               Available values are `present` and `absent`. Default: `present`.
 * **conf_template** - Path of the template for the `server.conf` configuration
                       file. You may change this value to use a custom template.
 * **description** - A description that will be written in the configuration
                     file. Defaults to the name of the resource.
+* **compression** - Compression algorithm. Currently supports `gzip` (default),
+                   `bzip2`, and `custom`. Disabled if false.
+* **pre_backup_script** - Script to launch before backups. Disabled if false
+                          (default).
+* **post_backup_script** - Script to launch after backups. Disabled if false
+                           (default).
+* **pre_archive_script** - Script to launch before a WAL file is archived by
+                           maintenance. Disabled if false (default).
+* **post_archive_script** - Script to launch after a WAL file is archived by
+                           maintenance. Disabled if false (default).
+* **immediate_checkpoint** - Force the checkpoint on the Postgres server to
+                             happen immediately and start your backup copy
+                             process as soon as possible. Disabled if false
+                             (default)
+* **basebackup_retry_times** - Number of retries fo data copy during base
+                               backup after an error. Default = 0
+* **basebackup_retry_sleep** - Number of seconds to wait after after a failed
+                               copy, before retrying. Default = 30
+* **backup_options** - Behavior for backup operations: possible values are
+                       exclusive_backup (default) and concurrent_backup
+* **minimum_redundancy** - Minimum number of required backups (redundancy).
+                           Default = 0
+* **last_backup_maximum_age** - Time frame that must contain the latest backup
+                                date. If the latest backup is older than the
+                                time frame, barman check command will report an
+                                error to the user. Empty if false (default).
+* **retention_policy** - Base backup retention policy, based on redundancy or
+                         recovery window. Default empty (no retention enforced).
+                         Value must be greater than or equal to the server
+                         minimum redundancy level (if not is is assigned to
+                         that value and a warning is generated).
+* **wal_retention_policy** - WAL archive logs retention policy. Currently, the
+                             only allowed value for wal_retention_policy is the
+                             special value main, that maps the retention policy
+                             of archive logs to that of base backups.
+* **retention_policy_mode** - Can only be set to auto (retention policies are
+                              automatically enforced by the barman cron command)
+* **reuse_backup** - Incremental backup is a kind of full periodic backup which
+                     saves only data changes from the latest full backup
+                     available in the catalogue for a specific PostgreSQL
+                     server. Disabled if false. Default false.
+* **custom_lines** - DEPRECATED. Custom configuration directives (e.g. for
+                     custom compression). Defaults to empty.
+
 
 See the file **server.pp** for more details.
 
@@ -237,7 +287,7 @@ can back up.
 
 The parameter **barman::settings::autoconfigure** in the **barman** class
 enables the inclusion of the Puppet classes involved in the autoconfiguration.
-The default value is 'false'.
+The default value is `false`.
 
 The parameter **barman::settings::host_group** in the **barman** class is used
 to create different host groups. If the same value for this parameter is used
@@ -264,6 +314,9 @@ More details in the **autoconfigure.pp** file.
 * **host_group** - Tag the different host groups for the backup
                    (default value is set from the `settings` class).
 
+* **exported_ipaddress** - The barman server address to allow in the PostgreSQL
+                           server ph_hba.conf. Defaults to `${::ipaddress}/32`.
+
 ### barman::postgres
 
 This class exports resources to the Barman server (Barman configurations,
@@ -276,16 +329,16 @@ More details in the **postgres.pp** file.
 #### Parameters
 
 * **host_group** - Tag the different host groups for the backup
-                   (default value is set from the 'settings' class).
+                   (default value is set from the `settings` class).
 * **wal_level** - Configuration of the *wal_level* parameter in the postgresql.conf
-                  file. The default value is 'archive'.
-* **barman_user** - Definition of the 'barman' user used in Barman 'conninfo'. The
-                    default value is set from the 'settings' class.
+                  file. The default value is `archive`.
+* **barman_user** - Definition of the `barman` user used in Barman `conninfo`. The
+                    default value is set from the `settings` class.
 * **barman_dbuser** - Definition of the user used by Barman to connect to the
-                      PostgreSQL database(s) in the 'conninfo'. The default value is
-                      set from the 'settings' class.
+                      PostgreSQL database(s) in the `conninfo`. The default value is
+                      set from the `settings` class.
 * **barman_home** - Definition of the barman home directory. The default value
-                    is set from the 'settings' class.
+                    is set from the `settings` class.
 * **backup_mday** - Day of the month set in the cron for the backup schedule.
                     The default value (undef) ensure daily backups.
 * **backup_wday** - Day of the week set in the cron for the backup schedule.
@@ -297,10 +350,59 @@ More details in the **postgres.pp** file.
 * **password** - Password used by Barman to connect to PosgreSQL. The default
                  value (empty string) allows the generation of a random password.
 * **server_address** - The whole fqdn of the PostgreSQL server used in Barman
-                       'ssh_command' (automatically configured by Puppet).
+                       `ssh_command` automatically configured by Puppet).
 * **postgres_server_id** - Id of the PostgreSQL server, given by its host name
                            (automatically configured by Puppet).
 * **postgres_user** - The PostgreSQL user used in Barman *ssh_command*.
+* **ensure** - Ensure the configuration file for the server is present.
+               Available values are `present` and `absent`. Default: `present`.
+* **conf_template** - Path of the template for the `server.conf` configuration
+                      file. You may change this value to use a custom template.
+* **description** - A description that will be written in the configuration
+                    file. Defaults to the name of the resource.
+* **compression** - Compression algorithm. Currently supports `gzip` (default),
+                   `bzip2`, and `custom`. Disabled if false.
+* **pre_backup_script** - Script to launch before backups. Disabled if false
+                          (default).
+* **post_backup_script** - Script to launch after backups. Disabled if false
+                           (default).
+* **pre_archive_script** - Script to launch before a WAL file is archived by
+                           maintenance. Disabled if false (default).
+* **post_archive_script** - Script to launch after a WAL file is archived by
+                           maintenance. Disabled if false (default).
+* **immediate_checkpoint** - Force the checkpoint on the Postgres server to
+                             happen immediately and start your backup copy
+                             process as soon as possible. Disabled if false
+                             (default)
+* **basebackup_retry_times** - Number of retries fo data copy during base
+                               backup after an error. Default = 0
+* **basebackup_retry_sleep** - Number of seconds to wait after after a failed
+                               copy, before retrying. Default = 30
+* **backup_options** - Behavior for backup operations: possible values are
+                       exclusive_backup (default) and concurrent_backup
+* **minimum_redundancy** - Minimum number of required backups (redundancy).
+                           Default = 0
+* **last_backup_maximum_age** - Time frame that must contain the latest backup
+                                date. If the latest backup is older than the
+                                time frame, barman check command will report an
+                                error to the user. Empty if false (default).
+* **retention_policy** - Base backup retention policy, based on redundancy or
+                         recovery window. Default empty (no retention enforced).
+                         Value must be greater than or equal to the server
+                         minimum redundancy level (if not is is assigned to
+                         that value and a warning is generated).
+* **wal_retention_policy** - WAL archive logs retention policy. Currently, the
+                             only allowed value for wal_retention_policy is the
+                             special value main, that maps the retention policy
+                             of archive logs to that of base backups.
+* **retention_policy_mode** - Can only be set to auto (retention policies are
+                              automatically enforced by the barman cron command)
+* **reuse_backup** - Incremental backup is a kind of full periodic backup which
+                     saves only data changes from the latest full backup
+                     available in the catalogue for a specific PostgreSQL
+                     server. Disabled if false. Default false.
+* **custom_lines** - DEPRECATED. Custom configuration directives (e.g. for
+                     custom compression). Defaults to empty.
 
 ## License
 

@@ -59,8 +59,8 @@
 #                    saves only data changes from the latest full backup
 #                    available in the catalogue for a specific PostgreSQL
 #                    server. Disabled if false. Default false.
-# [*custom_lines*] - Custom configuration directives (e.g. for custom
-#                    compression). Defaults to empty.#
+# [*custom_lines*] - DEPRECATED. Custom configuration directives (e.g. for
+#                    custom compression). Defaults to empty.
 # === Examples
 #
 #  barman::server { 'main':
