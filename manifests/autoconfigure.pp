@@ -83,11 +83,11 @@ class barman::autoconfigure (
   if ($::barman_key != undef and $::barman_key != '') {
     $barman_key_splitted = split($::barman_key, ' ')
     @@ssh_authorized_key { $barman::settings::user:
-      ensure  => present,
-      user    => 'postgres',
-      type    => $barman_key_splitted[0],
-      key     => $barman_key_splitted[1],
-      tag     => "barman-${host_group}",
+      ensure => present,
+      user   => 'postgres',
+      type   => $barman_key_splitted[0],
+      key    => $barman_key_splitted[1],
+      tag    => "barman-${host_group}",
     }
   }
 

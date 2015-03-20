@@ -212,31 +212,31 @@ class barman::postgres (
   }
 
   @@cron { "barman_backup_${::hostname}":
-    command    => "[ -x /usr/bin/barman ] && /usr/bin/barman -q backup ${::hostname}",
-    user       => 'root',
-    monthday   => $backup_mday,
-    weekday    => $backup_wday,
-    hour       => $backup_hour,
-    minute     => $backup_minute,
-    tag        => "barman-${host_group}",
+    command  => "[ -x /usr/bin/barman ] && /usr/bin/barman -q backup ${::hostname}",
+    user     => 'root',
+    monthday => $backup_mday,
+    weekday  => $backup_wday,
+    hour     => $backup_hour,
+    minute   => $backup_minute,
+    tag      => "barman-${host_group}",
   }
 
   # Fill the .pgpass file
   @@file_line { "barman_pgpass_content-${::hostname}":
-    path   => "${barman_home}/.pgpass",
-    line   => "${server_address}:*:${barman_dbname}:${barman_dbuser}:${real_password}",
-    tag    => "barman-${host_group}",
+    path => "${barman_home}/.pgpass",
+    line => "${server_address}:*:${barman_dbname}:${barman_dbuser}:${real_password}",
+    tag  => "barman-${host_group}",
   }
 
   # Ssh key of 'postgres' user in PostgreSQL server
   if ($::postgres_key != undef and $::postgres_key != '') {
     $postgres_key_splitted = split($::postgres_key, ' ')
     @@ssh_authorized_key { "postgres-${::hostname}":
-      ensure  => present,
-      user    => $barman_user,
-      type    => $postgres_key_splitted[0],
-      key     => $postgres_key_splitted[1],
-      tag     => "barman-${host_group}-postgresql",
+      ensure => present,
+      user   => $barman_user,
+      type   => $postgres_key_splitted[0],
+      key    => $postgres_key_splitted[1],
+      tag    => "barman-${host_group}-postgresql",
     }
   }
 }

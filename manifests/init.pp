@@ -205,8 +205,8 @@ class barman (
     }
   }
   package { 'barman':
-    ensure  => $ensure,
-    tag     => 'postgresql',
+    ensure => $ensure,
+    tag    => 'postgresql',
   }
 
   file { '/etc/barman.conf.d':
