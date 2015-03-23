@@ -40,25 +40,63 @@ describe 'barman' do
 
   # Rotates the right log when supplied
   context "with different log" do
-    let(:params) { {
-      :logfile  => '/tmp/foo'
-    } }
+    let(:params) do
+      {
+        :logfile  => '/tmp/foo'
+      }
+    end
 
     it { is_expected.to contain_file('/etc/logrotate.d/barman').with_content(/^\/tmp\/foo /) }
   end
 
   # Writes the right parameters in the compiled template
   context "with different parameters" do
-    let(:params) { {
+    let(:params) do
+      {
       :compression => false,
       :pre_backup_script => '/bin/false',
       :post_backup_script => '/bin/false',
       :custom_lines => 'thisisastring'
-    } }
+      }
+    end
 
     it { is_expected.not_to contain_file('/etc/barman.conf').with_content(/compression/) }
     it { is_expected.to contain_file('/etc/barman.conf').with_content(/pre_backup_script = \/bin\/false/) }
     it { is_expected.to contain_file('/etc/barman.conf').with_content(/post_backup_script = \/bin\/false/) }
     it { is_expected.to contain_file('/etc/barman.conf').with_content(/thisisastring/) }
   end
+
+  # Test interaction between manage_package_repo parameter and postgresql::global
+  context "with postgresql::globals already defined" do
+
+    let :pre_condition do
+      <<-HERE
+        class {'postgresql::globals':
+          manage_package_repo => true,
+        }
+      HERE
+    end
+
+    context "with manage_package_repo => true" do
+      let(:params) do
+        {
+          :manage_package_repo  => true
+        }
+      end
+
+      it { is_expected.to raise_error(Puppet::Error, /postgresql::globals is already defined/) }
+    end
+
+    context "with manage_package_repo => false" do
+      let(:params) do
+        {
+          :manage_package_repo  => false
+        }
+      end
+
+      it { is_expected.to compile }
+    end
+
+  end
+
 end

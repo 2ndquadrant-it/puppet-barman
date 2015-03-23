@@ -73,6 +73,13 @@
 #                          "${::ipaddress}/32".
 # [*host_group*] -  Tag used to collect and export resources during
 #                   autoconfiguration. Defaults to 'global'.
+# [*manage_package_repo*] - Configure PGDG repository. It is implemented
+#                           internally by declaring the `postgresql::globals`
+#                           class. If you need to customize the
+#                           `postgresql::globals` class declaration, keep the
+#                           `manage_package_repo` parameter disabled in `barman`
+#                           module and enable it directly in
+#                           `postgresql::globals` class.
 
 #
 # === Facts
@@ -200,8 +207,12 @@ class barman (
   }
 
   if $manage_package_repo {
-    class { 'postgresql::globals':
-      manage_package_repo => true,
+    if defined(Class['postgresql::globals']) {
+      fail('Class postgresql::globals is already defined. Set barman class manage_package_repo parameter to false (preferred) or remove the other definition.')
+    } else {
+      class { 'postgresql::globals':
+        manage_package_repo => true,
+      }
     }
   }
   package { 'barman':
