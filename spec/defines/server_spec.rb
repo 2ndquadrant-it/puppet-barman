@@ -1,12 +1,22 @@
 require 'spec_helper'
 
-describe 'barman::server' do
+describe 'barman::server', :type => :define do
+
+  let(:facts) do
+    {
+      :osfamily => 'Debian',
+      :operatingsystem => 'Debian',
+      :operatingsystemrelease => '6.0',
+      :lsbdistid => 'Debian',
+      :lsbdistcodename => 'squeeze',
+    }
+  end
 
   # Supply defaults for next tests
   before :all do
-    @defaults = { 
-      :conninfo    => 'user=user1 host=server1 db=db1 pass=pass1 port=5432',
-      :ssh_command => 'ssh postgres@server1'
+    @defaults = {
+      :conninfo       => 'user=user1 host=server1 db=db1 pass=pass1 port=5432',
+      :ssh_command    => 'ssh postgres@server1',
     }
   end
 
@@ -16,33 +26,37 @@ describe 'barman::server' do
       @defaults
   }
 
+  let :pre_condition do
+    "class {'barman':}"
+  end
+
   # Compiles template
-  it { should contain_file('/etc/barman.conf.d/server1.conf').with_content(/\[server1\]/) }
-  it { should contain_file('/etc/barman.conf.d/server1.conf').with_content(/conninfo = user=user1/) }
-  it { should contain_file('/etc/barman.conf.d/server1.conf').with_content(/ssh_command = ssh postgres@server1/) }
+  it { is_expected.to contain_file('/etc/barman.conf.d/server1.conf').with_content(/\[server1\]/) }
+  it { is_expected.to contain_file('/etc/barman.conf.d/server1.conf').with_content(/conninfo = user=user1/) }
+  it { is_expected.to contain_file('/etc/barman.conf.d/server1.conf').with_content(/ssh_command = ssh postgres@server1/) }
 
   # Runs 'barman check' on the new server
-  it { should contain_exec('barman-check-server1').with_command('barman check server1 || true') }
+  it { is_expected.to contain_exec('barman-check-server1').with_command('barman check server1 || true') }
 
   # Adds compression settings when asked
   context "without settings" do
-    it { should_not contain_file('/etc/barman.conf.d/server1.conf').with_content(/compression/) }
-    it { should_not contain_file('/etc/barman.conf.d/server1.conf').with_content(/_backup_script/) }
+    it { is_expected.to contain_file('/etc/barman.conf.d/server1.conf').with_content(/compression = gzip/) }
+    it { is_expected.not_to contain_file('/etc/barman.conf.d/server1.conf').with_content(/_backup_script/) }
   end
   # Does not add compression settings when not asked
   context "with settings" do
-    let(:params) { @defaults.merge({ :compression => 'gzip', :pre_backup_script => 'true', :post_backup_script => 'true', :custom_lines => 'thisisastring' }) }
-    it { should contain_file('/etc/barman.conf.d/server1.conf').with_content(/compression = /) }
-    it { should contain_file('/etc/barman.conf.d/server1.conf').with_content(/pre_backup_script = /) }
-    it { should contain_file('/etc/barman.conf.d/server1.conf').with_content(/post_backup_script = /) }
-    it { should contain_file('/etc/barman.conf.d/server1.conf').with_content(/thisisastring/) }
+    let(:params) { @defaults.merge({ :compression => 'bzip2', :pre_backup_script => 'true', :post_backup_script => 'true', :custom_lines => 'thisisastring' }) }
+    it { is_expected.to contain_file('/etc/barman.conf.d/server1.conf').with_content(/compression = bzip2/) }
+    it { is_expected.to contain_file('/etc/barman.conf.d/server1.conf').with_content(/pre_backup_script = /) }
+    it { is_expected.to contain_file('/etc/barman.conf.d/server1.conf').with_content(/post_backup_script = /) }
+    it { is_expected.to contain_file('/etc/barman.conf.d/server1.conf').with_content(/thisisastring/) }
   end
 
   # Fails with an invalid name
   context "with invalid name" do
     let(:title) { 'server!@#%' }
     it {
-      expect{ should contain_class('barman::server') }.to raise_error(Puppet::Error,/is not a valid name/)
+      expect{ is_expected.to contain_class('barman::server') }.to raise_error(Puppet::Error,/is not a valid name/)
     }
   end
 
@@ -50,13 +64,13 @@ describe 'barman::server' do
   context "without conninfo" do
     let(:params) { { :ssh_command => 'ssh postgres@server1' } }
     it {
-      expect{ should contain_class('barman::server') }.to raise_error(Puppet::Error,/Must pass conninfo /)
+      expect{ is_expected.to contain_class('barman::server') }.to raise_error(Puppet::Error,/Must pass conninfo /)
     }
   end
   context "without ssh_command" do
     let(:params) { { :conninfo => 'user=user1 host=server1 db=db1 pass=pass1 port=5432' } }
     it {
-      expect{ should contain_class('barman::server') }.to raise_error(Puppet::Error,/Must pass ssh_command/)
+      expect{ is_expected.to contain_class('barman::server') }.to raise_error(Puppet::Error,/Must pass ssh_command/)
     }
   end
 
