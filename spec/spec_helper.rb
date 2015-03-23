@@ -6,6 +6,12 @@ RSpec.configure do |c|
   end
   c.include PuppetlabsSpec::Files
 
+  c.before :each do
+    if ENV['STRICT_VARIABLES'] == 'yes'
+      Puppet.settings[:strict_variables] = true
+    end
+  end
+
   c.after :each do
     PuppetlabsSpec::Files.cleanup
   end
