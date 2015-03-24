@@ -154,7 +154,7 @@ class barman::postgres (
   $custom_lines            = $::barman::custom_lines,
 ) inherits ::barman::settings {
 
-  unless defined(Class['postgresql::server']) {
+  if !defined(Class['postgresql::server']) {
     fail('barman::server requires the postgresql::server module installed and configured')
   }
 

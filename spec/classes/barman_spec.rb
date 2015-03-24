@@ -9,6 +9,7 @@ describe 'barman' do
       :operatingsystemrelease => '6.0',
       :lsbdistid => 'Debian',
       :lsbdistcodename => 'squeeze',
+      :ipaddress => '10.0.0.1',
     }
   end
 
