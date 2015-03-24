@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/2ndquadrant-it/puppet-barman.svg?branch=master)](https://travis-ci.org/2ndquadrant-it/puppet-barman)
+
 # Barman module for Puppet
 
 ## Description
