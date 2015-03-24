@@ -1,6 +1,6 @@
 {
   "name": "it2ndq-barman",
-  "version": "0.2.1",
+  "version": "1.0.0",
   "author": "it2ndq",
   "summary": "Barman (Backup and Recovery Manager for PostgreSQL) module",
   "license": "GPL-3.0",
