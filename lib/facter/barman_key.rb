@@ -20,12 +20,14 @@ end
 
 
 Facter.add('barman_key') do
+  confine :kernel => 'Linux'
   setcode do
     safe_keygen_and_return('barman')
   end
 end
 
 Facter.add('postgres_key') do
+  confine :kernel => 'Linux'
   setcode do
     safe_keygen_and_return('postgres')
   end
