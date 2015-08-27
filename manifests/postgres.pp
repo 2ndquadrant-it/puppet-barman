@@ -173,7 +173,7 @@ class barman::postgres (
   # define user used by Barman to connect into PostgreSQL database(s)
   postgresql::server::role { $barman_dbuser:
     login         => true,
-    password_hash => postgresql_password($barman_dbuser, inline_template('<%= @real_password.to_s %>'),
+    password_hash => postgresql_password($barman_dbuser, inline_template('<%= @real_password.to_s %>')),
     superuser     => true,
   }
 
