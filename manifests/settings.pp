@@ -59,8 +59,6 @@ class barman::settings (
   $post_archive_script     = false,
   $basebackup_retry_times  = false,
   $basebackup_retry_sleep  = false,
-  $pre_backup_script       = false,
-  $post_backup_script      = false,
   $backup_options          = 'exclusive_backup',
   $minimum_redundancy      = '0',
   $last_backup_maximum_age = false,
