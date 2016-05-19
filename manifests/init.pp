@@ -222,6 +222,8 @@ class barman (
 
   file { '/etc/barman.conf.d':
     ensure  => $ensure_directory,
+    purge   => true,
+    recurse => true,
     owner   => 'root',
     group   => $group,
     mode    => '0750',
