@@ -65,13 +65,13 @@ describe 'barman::server', :type => :define do
   context "without conninfo" do
     let(:params) { { :ssh_command => 'ssh postgres@server1' } }
     it {
-      expect{ is_expected.to contain_class('barman::server') }.to raise_error(Puppet::Error,/Must pass conninfo /)
+      expect{ is_expected.to contain_class('barman::server') }.to raise_error(Puppet::Error,/(Must pass |expects a value for parameter ')conninfo/)
     }
   end
   context "without ssh_command" do
     let(:params) { { :conninfo => 'user=user1 host=server1 db=db1 pass=pass1 port=5432' } }
     it {
-      expect{ is_expected.to contain_class('barman::server') }.to raise_error(Puppet::Error,/Must pass ssh_command/)
+      expect{ is_expected.to contain_class('barman::server') }.to raise_error(Puppet::Error,/(Must pass |expects a value for parameter ')ssh_command/)
     }
   end
 

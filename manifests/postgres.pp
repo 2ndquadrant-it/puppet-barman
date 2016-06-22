@@ -160,7 +160,7 @@ class barman::postgres (
 
   # Generate a new password if not defined
   $real_password = $password ? {
-    ''      => fqdn_rand('30','fwsfbsfw'),
+    ''      => fqdn_rand_string('30','','fwsfbsfw'),
     default => $password,
   }
 
