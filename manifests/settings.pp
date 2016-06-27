@@ -70,7 +70,7 @@ class barman::settings (
   $autoconfigure           = false,
   $host_group              = 'global',
   $manage_package_repo     = false,
-  $purge_old_servers       = false,
+  $purge_unknown_conf      = false,
 ) {
 
 }
