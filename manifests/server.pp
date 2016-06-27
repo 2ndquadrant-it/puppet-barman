@@ -129,16 +129,16 @@ define barman::server (
 
   # check to make sure basebackup_retry_times is a numerical value
   if $basebackup_retry_times != false {
-    validate_re($basebackup_retry_times, [ '^[0-9]+$' ])
+    validate_integer($basebackup_retry_times, undef, 0)
   }
 
   # check to make sure basebackup_retry_sleep is a numerical value
   if $basebackup_retry_sleep != false {
-    validate_re($basebackup_retry_sleep, [ '^[0-9]+$' ])
+    validate_integer($basebackup_retry_sleep, undef, 0)
   }
 
   # check if minimum_redundancy is a number
-  validate_re($minimum_redundancy, [ '^[0-9]+$' ])
+  validate_integer($minimum_redundancy, undef, 0)
 
   # check to make sure last_backup_maximum_age identifies (DAYS | WEEKS | MONTHS) greater then 0
   if $last_backup_maximum_age != false {
