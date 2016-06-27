@@ -80,6 +80,8 @@
 #                           `manage_package_repo` parameter disabled in `barman`
 #                           module and enable it directly in
 #                           `postgresql::globals` class.
+# [*purge_old_servers*] - Whether or not old servers will be removed from config
+#                         when they disappear from puppetdb
 
 #
 # === Facts
@@ -154,6 +156,7 @@ class barman (
   $manage_package_repo     = $::barman::settings::manage_package_repo,
   $exported_ipaddress      = "${::ipaddress}/32",
   $host_group              = $::barman::settings::host_group,
+  $purge_old_servers       = $::barman::settings::purge_old_servers,
 ) inherits barman::settings {
 
   # Check if autoconfigure is a boolean
@@ -222,6 +225,8 @@ class barman (
 
   file { '/etc/barman.conf.d':
     ensure  => $ensure_directory,
+    purge   => $purge_old_servers,
+    recurse => true,
     owner   => 'root',
     group   => $group,
     mode    => '0750',
