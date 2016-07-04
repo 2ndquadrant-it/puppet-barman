@@ -76,7 +76,8 @@ class barman::autoconfigure (
 
   # export the archive command
   @@barman::archive_command { $::barman::barman_fqdn :
-    tag                 => "barman-${host_group}",
+    tag         => "barman-${host_group}",
+    barman_home => $barman::home,
   }
 
   # export the 'barman' SSH key - create if not present

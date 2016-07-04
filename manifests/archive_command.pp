@@ -38,6 +38,7 @@ define barman::archive_command (
   $postgres_server_id  = 'default',
   $barman_user         = $::barman::settings::user,
   $barman_server       = $title,
+  $barman_home         = $barman::settings::home,
   $barman_incoming_dir = '',
 ) {
 
@@ -49,7 +50,7 @@ define barman::archive_command (
 
   # Generate path if not explicitely defined
   $real_barman_incoming_dir = $barman_incoming_dir ? {
-    ''      => "${barman::settings::home}/${postgres_server_id}/incoming",
+    ''      => "${barman_home}/${postgres_server_id}/incoming",
     default => $barman_incoming_dir,
   }
 
