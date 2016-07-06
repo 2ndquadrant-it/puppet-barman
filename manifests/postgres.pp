@@ -136,22 +136,22 @@ class barman::postgres (
   $ensure                  = 'present',
   $conf_template           = 'barman/server.conf.erb',
   $description             = $name,
-  $compression             = $::barman::compression,
-  $immediate_checkpoint    = $::barman::immediate_checkpoint,
-  $pre_backup_script       = $::barman::pre_backup_script,
-  $post_backup_script      = $::barman::post_backup_script,
-  $pre_archive_script      = $::barman::pre_archive_script,
-  $post_archive_script     = $::barman::post_archive_script,
-  $basebackup_retry_times  = $::barman::basebackup_retry_times,
-  $basebackup_retry_sleep  = $::barman::basebackup_retry_sleep,
-  $backup_options          = $::barman::backup_options,
-  $minimum_redundancy      = $::barman::minimum_redundancy,
-  $last_backup_maximum_age = $::barman::last_backup_maximum_age,
-  $retention_policy        = $::barman::retention_policy,
-  $retention_policy_mode   = $::barman::retention_policy_mode,
-  $wal_retention_policy    = $::barman::wal_retention_policy,
-  $reuse_backup            = $::barman::reuse_backup,
-  $custom_lines            = $::barman::custom_lines,
+  $compression             = $::barman::settings::compression,
+  $immediate_checkpoint    = $::barman::settings::immediate_checkpoint,
+  $pre_backup_script       = $::barman::settings::pre_backup_script,
+  $post_backup_script      = $::barman::settings::post_backup_script,
+  $pre_archive_script      = $::barman::settings::pre_archive_script,
+  $post_archive_script     = $::barman::settings::post_archive_script,
+  $basebackup_retry_times  = $::barman::settings::basebackup_retry_times,
+  $basebackup_retry_sleep  = $::barman::settings::basebackup_retry_sleep,
+  $backup_options          = $::barman::settings::backup_options,
+  $minimum_redundancy      = $::barman::settings::minimum_redundancy,
+  $last_backup_maximum_age = $::barman::settings::last_backup_maximum_age,
+  $retention_policy        = $::barman::settings::retention_policy,
+  $retention_policy_mode   = $::barman::settings::retention_policy_mode,
+  $wal_retention_policy    = $::barman::settings::wal_retention_policy,
+  $reuse_backup            = $::barman::settings::reuse_backup,
+  $custom_lines            = $::barman::settings::custom_lines,
 ) inherits ::barman::settings {
 
   if !defined(Class['postgresql::server']) {
@@ -173,7 +173,7 @@ class barman::postgres (
   # define user used by Barman to connect into PostgreSQL database(s)
   postgresql::server::role { $barman_dbuser:
     login         => true,
-    password_hash => postgresql_password($barman_dbuser, $real_password),
+    password_hash => postgresql_password($barman_dbuser, inline_template('<%= @real_password.to_s %>')),
     superuser     => true,
   }
 
