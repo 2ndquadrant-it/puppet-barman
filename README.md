@@ -60,10 +60,10 @@ module.
 
 **Note:** In versions of `it2ndq/barman' > 2.1, setup of PGDG
 repository can be done automatically by setting the
-`manage_package_repo` parameter to to `true`. It will be implemented
+`manage\_package\_repo` parameter to to `true`. It will be implemented
 internally by declaring the `postgresql::globals` class. If you need
 to customize the `postgresql::globals` class declaration, keep the
-`manage_package_repo` parameter disabled in `barman` module and enable
+`manage\_package\_repo` parameter disabled in `barman` module and enable
 it directly in `postgresql::globals` class.
 
 All the configuration options that Barman accepts can be defined through Puppet.
@@ -99,6 +99,11 @@ These are the available parameters for the `barman` class
             symlinked to the default (`/var/lib/barman`). You should not change
             this value after the first setup. Defaults to
             `barman::settings::home`.
+* **archiver** - Whether the log shipping backup mechanism is active or not
+                 (defaults to true)
+* **archiver_batch_size** - Setting this option enables batch processing of WAL
+                            files. The default processes all currently available
+                            files.
 * **logfile** - A different log file. The default is
                 `barman::settings::logfile`.
 * **compression** - Compression algorithm. Currently supports `gzip`, `bzip2`,
@@ -107,59 +112,141 @@ These are the available parameters for the `barman` class
                               happen immediately and start your backup copy
                               process as soon as possible. Disabled if false.
                               Defaults to
-                              `barman::settings::immediate_checkpoint`
-* **pre_backup_script** - Script to run before backups. Disabled if false.
-                          Defaults to `barman::settings::pre_backup_script`.
-* **post_backup_script** - Script to run after backups. Disabled if false.
-                           Defaults to `barman::settings::post_backup_script`.
-* **pre_archive_script** - Script to run before a WAL file is archived by
-                           maintenance. Disabled if false.
-                           Defaults to `barman::settings::pre_archive_script`.
-* **post_archive_script** - Script to run after a WAL file is archived by
-                            maintenance. Disabled if false.
-                            Defaults to `barman::settings::post_archive_script`.
+                              `barman::settings::immediate\_checkpoint`
+* **post_archive_retry_script** - Hook script launched after a WAL file is
+                                  archived by maintenance. Being this a retry hook
+                                  script, Barman will retry the execution of the
+                                  script until this either returns a SUCCESS (0),
+                                  an ABORT_CONTINUE (62) or an ABORT_STOP (63)
+                                  code. In a post archive scenario, ABORT_STOP has
+                                  currently the same effects as ABORT_CONTINUE.
+* **post_archive_script** - Hook script launched after a WAL file is archived by
+                            maintenance, after 'post_archive_retry_script'.
+* **post_backup_retry_script** - Hook script launched after a base backup. Being
+                                 this a retry hook script, Barman will retry the
+                                 execution of the script until this either returns
+                                 a SUCCESS (0), an ABORT_CONTINUE (62) or an
+                                 ABORT_STOP (63) code. In a post backup scenario,
+                                 ABORT_STOP has currently the same effects as
+                                 ABORT_CONTINUE.
+* **post_backup_script** - Hook script launched after a base backup, after
+                           'post_backup_retry_script'.
+* **pre_archive_retry_script** - Hook script launched before a WAL file is
+                                 archived by maintenance, after
+                                 'pre_archive_script'. Being this a retry hook
+                                 script, Barman will retry the execution of the
+                                 script until this either returns a SUCCESS (0),
+                                 an ABORT_CONTINUE (62) or an ABORT_STOP (63)
+                                 code. Returning ABORT_STOP will propagate the
+                                 failure at a higher level and interrupt the WAL
+                                 archiving operation.
+* **pre_archive_script** - Hook script launched before a WAL file is archived by
+                           maintenance.
+* **pre_backup_retry_script** - Hook script launched before a base backup, after
+                                'pre_backup_script'. Being this a retry hook
+                                script, Barman will retry the execution of the
+                                script until this either returns a SUCCESS (0), an
+                                ABORT_CONTINUE (62) or an ABORT_STOP (63) code.
+                                Returning ABORT_STOP will propagate the failure at
+                                a higher level and interrupt the backup operation.
+* **pre_backup_script** - Hook script launched before a base backup.
 * **basebackup_retry_times** - Number of retries for data copy during base
                                backup after an error. Defaults to
-                               `barman::settings::basebackup_retry_times`
+                               `barman::settings::basebackup\_retry\_times`
 * **basebackup_retry_sleep** - Number of seconds to wait after a failed
                                copy, before retrying. Defaults to
-                               `barman::settings::basebackup_retry_sleep`
-* **backup_options** - Behaviour for backup operations: possible values are
-                       `exclusive_backup` and `concurrent_backup`. Defaults to
-                      `barman::settings::backup_options`.
+                               `barman::settings::basebackup\_retry\_sleep`
+* **backup_method** - Configure the method barman used for backup execution. If
+                      set to rsync (default), barman will execute backup using the
+                      rsync command. If set to postgres barman will use the
+                      pg_basebackup command to execute the backup.
+* **backup_options** - Behavior for backup operations: possible values are
+                       exclusive_backup (default) and concurrent_backup
+* **bandwidth_limit** - This option allows you to specify a maximum transfer rate
+                        in kilobytes per second. A value of zero specifies no
+                        limit (default).
+* **check_timeout** - Maximum execution time, in seconds per server, for a barman
+                      check command. Set to 0 to disable the timeout. Positive
+                      integer, default 30.
+* **custom_compression_filter** - Customised compression algorithm applied to WAL
+                                  files.
+* **custom_decompression_filter** - Customised decompression algorithm applied to
+                                    compressed WAL files; this must match the
+                                    compression algorithm.
 * **minimum_redundancy** - Minimum number of required backups (redundancy).
-                           Defaults to `barman::settings::minimum_redundancy`.
+                           Defaults to `barman::settings::minimum\_redundancy`.
+* **network_compression** - This option allows you to enable data compression for
+                            network transfers. If set to false (default), no
+                            compression is used. If set to true, compression is
+                            enabled, reducing network usage.
+* **path_prefix** - One or more absolute paths, separated by colon, where Barman
+                    looks for executable files. The paths specified in
+                    path_prefix are tried before the ones specified in PATH
+                    environment variable.
 * **last_backup_maximum_age** - Time frame in which the latest backup date must
                                 be contained. If the latest backup is older
                                 than the time frame, `barman check` command
                                 will report an error to the user. Empty if
                                 false. Defaults to
-                                `barman::settings::last_backup_maximum_age`.
+                                `barman::settings::last\_backup\_maximum\_age`.
 * **retention_policy** - Base backup retention policy, based on redundancy or
                          recovery window. Value must be greater than or equal
                          to the server minimum redundancy level. If this
                          condition is not satistied, the minimum redundancy
                          value is assigned to this parameter. Defaults to
-                         `barman::settings::retention_policy`.
+                         `barman::settings::retention\_policy`.
+* **slot_name** - Physical replication slot to be used by the receive-wal
+                  command when streaming_archiver is set to on. Requires
+                  postgreSQL >= 9.4. Default: undef (disabled).
+* **streaming_archiver** - This option allows you to use the PostgreSQL's
+                           streaming protocol to receive transaction logs from a
+                           server. This activates connection checks as well as
+                           management (including compression) of WAL files. If
+                           set to off (default) barman will rely only on
+                           continuous archiving for a server WAL archive
+                           operations, eventually terminating any running
+                           pg_receivexlog for the server.
+* **streaming_archiver_batch_size** - This option allows you to activate batch
+                                      processing of WAL files for the
+                                      streaming_archiver process, by setting it to
+                                      a value > 0. Otherwise, the traditional
+                                      unlimited processing of the WAL queue is
+                                      enabled.
+* **streaming_archiver_name** - Identifier to be used as `application\_name` by the
+                                receive-wal command. Only available with
+                                pg_receivexlog >= 9.3. By default it is set to
+                                barman_receive_wal.
+* **streaming_backup_name** - Identifier to be used as `application\_name` by the
+                              pg_basebackup command. Only available with
+                              pg_basebackup >= 9.3. By default it is set to
+                              barman_streaming_backup.
+* **streaming_conninfo** - Connection string used by Barman to connect to the
+                           Postgres server via streaming replication protocol. By
+                           default it is set to the same value as *conninfo*.
+* **tablespace_bandwidth_limit** - This option allows you to specify a maximum
+                                   transfer rate in kilobytes per second, by
+                                   specifying a comma separated list of
+                                   tablespaces (pairs TBNAME:BWLIMIT). A value of
+                                   zero specifies no limit (default).
 * **wal_retention_policy** - WAL archive logs retention policy. Currently, the
-                             only allowed value for `wal_retention_policy` is
+                             only allowed value for `wal\_retention\_policy` is
                              the special value `main`, that maps the retention
                              policy of archive logs to that of base backups.
                              Defaults to
-                             `barman::settings::wal_retention_policy`.
+                             `barman::settings::wal\_retention\_policy`.
 * **retention_policy_mode** - Can only be set to `auto` (retention policies are
                               automatically enforced by the `barman cron`
                               command). Defaults to
-                              `barman::settings::retention_policy_mode`.
+                              `barman::settings::retention\_policy\_mode`.
 * **reuse_backup** - Incremental backup is a kind of full periodic backup which
                      saves only data changes from the latest full backup
                      available in the catalogue for a specific PostgreSQL
                      server. Disabled if false. Available values are
                      `off`, `link` and `copy`. Defaults to
-                     `barman::settings::reuse_backup`.
+                     `barman::settings::reuse\_backup`.
 * **custom_lines** - DEPRECATED. Custom configuration directives (e.g. for
                      custom compression). Defaults to
-                     `barman::settings::custom_lines`.
+                     `barman::settings::custom\_lines`.
 * **barman_fqdn** - The fully qualified domain name of the Barman server. It is
                     exported in several resources in the PostgreSQL server.
                     Puppet automatically set this.
@@ -175,7 +262,7 @@ These are the available parameters for the `barman` class
                             internally by declaring the `postgresql::globals`
                             class. If you need to customize the
                             `postgresql::globals` class declaration, keep the
-                            `manage_package_repo` parameter disabled in `barman`
+                            `manage\_package\_repo` parameter disabled in `barman`
                             module and enable it directly in
                             `postgresql::globals` class.
 
@@ -240,18 +327,52 @@ The following parameters are unique to the `server` class:
                Available values are `present` and `absent`. Default: `present`.
 * **conf_template** - Path of the template for the `server.conf` configuration
                       file. You may change this value to use a custom template.
+* **archiver** - Whether the log shipping backup mechanism is active or not
+                 (defaults to true)
+* **archiver_batch_size** - Setting this option enables batch processing of WAL
+                            files. The default processes all currently available
+                            files.
 * **description** - A description that will be written in the configuration
                     file. Defaults to the name of the resource.
 * **compression** - Compression algorithm. Currently supports `gzip` (default),
                    `bzip2`, and `custom`. Disabled if false.
-* **pre_backup_script** - Script to launch before backups. Disabled if false
-                          (default).
-* **post_backup_script** - Script to launch after backups. Disabled if false
-                           (default).
-* **pre_archive_script** - Script to launch before a WAL file is archived by
-                           maintenance. Disabled if false (default).
-* **post_archive_script** - Script to launch after a WAL file is archived by
-                           maintenance. Disabled if false (default).
+* **post_archive_retry_script** - Hook script launched after a WAL file is
+                                  archived by maintenance. Being this a retry hook
+                                  script, Barman will retry the execution of the
+                                  script until this either returns a SUCCESS (0),
+                                  an ABORT_CONTINUE (62) or an ABORT_STOP (63)
+                                  code. In a post archive scenario, ABORT_STOP has
+                                  currently the same effects as ABORT_CONTINUE.
+* **post_archive_script** - Hook script launched after a WAL file is archived by
+                            maintenance, after 'post_archive_retry_script'.
+* **post_backup_retry_script** - Hook script launched after a base backup. Being
+                                 this a retry hook script, Barman will retry the
+                                 execution of the script until this either returns
+                                 a SUCCESS (0), an ABORT_CONTINUE (62) or an
+                                 ABORT_STOP (63) code. In a post backup scenario,
+                                 ABORT_STOP has currently the same effects as
+                                 ABORT_CONTINUE.
+* **post_backup_script** - Hook script launched after a base backup, after
+                           'post_backup_retry_script'.
+* **pre_archive_retry_script** - Hook script launched before a WAL file is
+                                 archived by maintenance, after
+                                 'pre_archive_script'. Being this a retry hook
+                                 script, Barman will retry the execution of the
+                                 script until this either returns a SUCCESS (0),
+                                 an ABORT_CONTINUE (62) or an ABORT_STOP (63)
+                                 code. Returning ABORT_STOP will propagate the
+                                 failure at a higher level and interrupt the WAL
+                                 archiving operation.
+* **pre_archive_script** - Hook script launched before a WAL file is archived by
+                           maintenance.
+* **pre_backup_retry_script** - Hook script launched before a base backup, after
+                                'pre_backup_script'. Being this a retry hook
+                                script, Barman will retry the execution of the
+                                script until this either returns a SUCCESS (0), an
+                                ABORT_CONTINUE (62) or an ABORT_STOP (63) code.
+                                Returning ABORT_STOP will propagate the failure at
+                                a higher level and interrupt the backup operation.
+* **pre_backup_script** - Hook script launched before a base backup.
 * **immediate_checkpoint** - Force the checkpoint on the Postgres server to
                              happen immediately and start your backup copy
                              process as soon as possible. Disabled if false
@@ -260,10 +381,33 @@ The following parameters are unique to the `server` class:
                                backup after an error. Default = 0
 * **basebackup_retry_sleep** - Number of seconds to wait after after a failed
                                copy, before retrying. Default = 30
+* **backup_method** - Configure the method barman used for backup execution. If
+                      set to rsync (default), barman will execute backup using the
+                      rsync command. If set to postgres barman will use the
+                      pg_basebackup command to execute the backup.
 * **backup_options** - Behavior for backup operations: possible values are
                        exclusive_backup (default) and concurrent_backup
+* **bandwidth_limit** - This option allows you to specify a maximum transfer rate
+                        in kilobytes per second. A value of zero specifies no
+                        limit (default).
+* **check_timeout** - Maximum execution time, in seconds per server, for a barman
+                      check command. Set to 0 to disable the timeout. Positive
+                      integer, default 30.
+* **custom_compression_filter** - Customised compression algorithm applied to WAL
+                                  files.
+* **custom_decompression_filter** - Customised decompression algorithm applied to
+                                    compressed WAL files; this must match the
+                                    compression algorithm.
 * **minimum_redundancy** - Minimum number of required backups (redundancy).
                            Default = 0
+* **network_compression** - This option allows you to enable data compression for
+                            network transfers. If set to false (default), no
+                            compression is used. If set to true, compression is
+                            enabled, reducing network usage.
+* **path_prefix** - One or more absolute paths, separated by colon, where Barman
+                    looks for executable files. The paths specified in
+                    path_prefix are tried before the ones specified in PATH
+                    environment variable.
 * **last_backup_maximum_age** - Time frame that must contain the latest backup
                                 date. If the latest backup is older than the
                                 time frame, barman check command will report an
@@ -273,6 +417,41 @@ The following parameters are unique to the `server` class:
                          Value must be greater than or equal to the server
                          minimum redundancy level (if not is is assigned to
                          that value and a warning is generated).
+* **slot_name** - Physical replication slot to be used by the receive-wal
+                  command when streaming_archiver is set to on. Requires
+                  postgreSQL >= 9.4. Default: undef (disabled).
+* **streaming_archiver** - This option allows you to use the PostgreSQL's
+                           streaming protocol to receive transaction logs from a
+                           server. This activates connection checks as well as
+                           management (including compression) of WAL files. If
+                           set to off (default) barman will rely only on
+                           continuous archiving for a server WAL archive
+                           operations, eventually terminating any running
+                           pg_receivexlog for the server.
+* **streaming_archiver_batch_size** - This option allows you to activate batch
+                                      processing of WAL files for the
+                                      streaming_archiver process, by setting it to
+                                      a value > 0. Otherwise, the traditional
+                                      unlimited processing of the WAL queue is
+                                      enabled.
+* **streaming_archiver_name** - Identifier to be used as `application\_name` by the
+                                receive-wal command. Only available with
+                                pg_receivexlog >= 9.3. By default it is set to
+                                barman_receive_wal.
+* **streaming_backup_name** - Identifier to be used as `application\_name` by the
+                              pg_basebackup command. Only available with
+                              pg_basebackup >= 9.3. By default it is set to
+                              barman_streaming_backup.
+* **streaming_conninfo** - Connection string used by Barman to connect to the
+                           Postgres server via streaming replication protocol. By
+                           default it is set to the same value as *conninfo*.
+* **streaming_wals_directory** - Directory where WAL files are streamed from the
+                                 PostgreSQL server to Barman.
+* **tablespace_bandwidth_limit** - This option allows you to specify a maximum
+                                   transfer rate in kilobytes per second, by
+                                   specifying a comma separated list of
+                                   tablespaces (pairs TBNAME:BWLIMIT). A value of
+                                   zero specifies no limit (default).
 * **wal_retention_policy** - WAL archive logs retention policy. Currently, the
                              only allowed value for wal_retention_policy is the
                              special value main, that maps the retention policy
@@ -372,18 +551,52 @@ More details in the **postgres.pp** file.
                Available values are `present` and `absent`. Default: `present`.
 * **conf_template** - Path of the template for the `server.conf` configuration
                       file. You may change this value to use a custom template.
+* **archiver** - Whether the log shipping backup mechanism is active or not
+                 (defaults to true)
+* **archiver_batch_size** - Setting this option enables batch processing of WAL
+                            files. The default processes all currently available
+                            files.
 * **description** - A description that will be written in the configuration
                     file. Defaults to the name of the resource.
 * **compression** - Compression algorithm. Currently supports `gzip` (default),
                    `bzip2`, and `custom`. Disabled if false.
-* **pre_backup_script** - Script to launch before backups. Disabled if false
-                          (default).
-* **post_backup_script** - Script to launch after backups. Disabled if false
-                           (default).
-* **pre_archive_script** - Script to launch before a WAL file is archived by
-                           maintenance. Disabled if false (default).
-* **post_archive_script** - Script to launch after a WAL file is archived by
-                           maintenance. Disabled if false (default).
+* **post_archive_retry_script** - Hook script launched after a WAL file is
+                                  archived by maintenance. Being this a retry hook
+                                  script, Barman will retry the execution of the
+                                  script until this either returns a SUCCESS (0),
+                                  an ABORT_CONTINUE (62) or an ABORT_STOP (63)
+                                  code. In a post archive scenario, ABORT_STOP has
+                                  currently the same effects as ABORT_CONTINUE.
+* **post_archive_script** - Hook script launched after a WAL file is archived by
+                            maintenance, after 'post_archive_retry_script'.
+* **post_backup_retry_script** - Hook script launched after a base backup. Being
+                                 this a retry hook script, Barman will retry the
+                                 execution of the script until this either returns
+                                 a SUCCESS (0), an ABORT_CONTINUE (62) or an
+                                 ABORT_STOP (63) code. In a post backup scenario,
+                                 ABORT_STOP has currently the same effects as
+                                 ABORT_CONTINUE.
+* **post_backup_script** - Hook script launched after a base backup, after
+                           'post_backup_retry_script'.
+* **pre_archive_retry_script** - Hook script launched before a WAL file is
+                                 archived by maintenance, after
+                                 'pre_archive_script'. Being this a retry hook
+                                 script, Barman will retry the execution of the
+                                 script until this either returns a SUCCESS (0),
+                                 an ABORT_CONTINUE (62) or an ABORT_STOP (63)
+                                 code. Returning ABORT_STOP will propagate the
+                                 failure at a higher level and interrupt the WAL
+                                 archiving operation.
+* **pre_archive_script** - Hook script launched before a WAL file is archived by
+                           maintenance.
+* **pre_backup_retry_script** - Hook script launched before a base backup, after
+                                'pre_backup_script'. Being this a retry hook
+                                script, Barman will retry the execution of the
+                                script until this either returns a SUCCESS (0), an
+                                ABORT_CONTINUE (62) or an ABORT_STOP (63) code.
+                                Returning ABORT_STOP will propagate the failure at
+                                a higher level and interrupt the backup operation.
+* **pre_backup_script** - Hook script launched before a base backup.
 * **immediate_checkpoint** - Force the checkpoint on the Postgres server to
                              happen immediately and start your backup copy
                              process as soon as possible. Disabled if false
@@ -392,10 +605,33 @@ More details in the **postgres.pp** file.
                                backup after an error. Default = 0
 * **basebackup_retry_sleep** - Number of seconds to wait after after a failed
                                copy, before retrying. Default = 30
+* **backup_method** - Configure the method barman used for backup execution. If
+                      set to rsync (default), barman will execute backup using the
+                      rsync command. If set to postgres barman will use the
+                      pg_basebackup command to execute the backup.
 * **backup_options** - Behavior for backup operations: possible values are
                        exclusive_backup (default) and concurrent_backup
+* **bandwidth_limit** - This option allows you to specify a maximum transfer rate
+                        in kilobytes per second. A value of zero specifies no
+                        limit (default).
+* **check_timeout** - Maximum execution time, in seconds per server, for a barman
+                      check command. Set to 0 to disable the timeout. Positive
+                      integer, default 30.
+* **custom_compression_filter** - Customised compression algorithm applied to WAL
+                                  files.
+* **custom_decompression_filter** - Customised decompression algorithm applied to
+                                    compressed WAL files; this must match the
+                                    compression algorithm.
 * **minimum_redundancy** - Minimum number of required backups (redundancy).
                            Default = 0
+* **network_compression** - This option allows you to enable data compression for
+                            network transfers. If set to false (default), no
+                            compression is used. If set to true, compression is
+                            enabled, reducing network usage.
+* **path_prefix** - One or more absolute paths, separated by colon, where Barman
+                    looks for executable files. The paths specified in
+                    path_prefix are tried before the ones specified in PATH
+                    environment variable.
 * **last_backup_maximum_age** - Time frame that must contain the latest backup
                                 date. If the latest backup is older than the
                                 time frame, barman check command will report an
@@ -405,6 +641,41 @@ More details in the **postgres.pp** file.
                          Value must be greater than or equal to the server
                          minimum redundancy level (if not is is assigned to
                          that value and a warning is generated).
+* **slot_name** - Physical replication slot to be used by the receive-wal
+                  command when streaming_archiver is set to on. Requires
+                  postgreSQL >= 9.4. Default: undef (disabled).
+* **streaming_archiver** - This option allows you to use the PostgreSQL's
+                           streaming protocol to receive transaction logs from a
+                           server. This activates connection checks as well as
+                           management (including compression) of WAL files. If
+                           set to off (default) barman will rely only on
+                           continuous archiving for a server WAL archive
+                           operations, eventually terminating any running
+                           pg_receivexlog for the server.
+* **streaming_archiver_batch_size** - This option allows you to activate batch
+                                      processing of WAL files for the
+                                      streaming_archiver process, by setting it to
+                                      a value > 0. Otherwise, the traditional
+                                      unlimited processing of the WAL queue is
+                                      enabled.
+* **streaming_archiver_name** - Identifier to be used as `application\_name` by the
+                                receive-wal command. Only available with
+                                pg_receivexlog >= 9.3. By default it is set to
+                                barman_receive_wal.
+* **streaming_backup_name** - Identifier to be used as `application\_name` by the
+                              pg_basebackup command. Only available with
+                              pg_basebackup >= 9.3. By default it is set to
+                              barman_streaming_backup.
+* **streaming_conninfo** - Connection string used by Barman to connect to the
+                           Postgres server via streaming replication protocol. By
+                           default it is set to the same value as *conninfo*.
+* **streaming_wals_directory** - Directory where WAL files are streamed from the
+                                 PostgreSQL server to Barman.
+* **tablespace_bandwidth_limit** - This option allows you to specify a maximum
+                                   transfer rate in kilobytes per second, by
+                                   specifying a comma separated list of
+                                   tablespaces (pairs TBNAME:BWLIMIT). A value of
+                                   zero specifies no limit (default).
 * **wal_retention_policy** - WAL archive logs retention policy. Currently, the
                              only allowed value for wal_retention_policy is the
                              special value main, that maps the retention policy
