@@ -7,23 +7,62 @@
 description = "<%= @description %>"
 ssh_command = <%= @ssh_command %>
 conninfo = <%= @conninfo %>
+archiver = <%= @archiver %>
+<%- if @archiver_batch_size -%>
+archiver_batch_size = <%= @archiver_batch_size %>
+<%- end -%>
+<%- if @backup_method -%>
+backup_method = <%= @backup_method %>
+<%- end -%>
+backup_options = <%= @backup_options %>
+<%- if @bandwidth_limit -%>
+bandwidth_limit = <%= @bandwidth_limit %>
+<%- end -%>
+<%- if @check_timeout -%>
+check_timeout = <%= @check_timeout %>
+<%- end -%>
 <%- if @compression -%>
 compression = <%= @compression %>
 <%- end -%>
-<%- if @pre_backup_script != false -%>
-pre_backup_script = <%= @pre_backup_script %>
+<%- if @custom_compression_filter -%>
+custom_compression_filter = <%= @custom_compression_filter %>
+<%- end -%>
+<%- if @custom_decompression_filter -%>
+custom_decompression_filter = <%= @custom_decompression_filter %>
+<%- end -%>
+minimum_redundancy = <%= @minimum_redundancy %>
+<%- if @network_compression -%>
+network_compression = <%= @network_compression %>
+<%- end -%>
+<%- if @path_prefix -%>
+path_prefix = <%= @path_prefix %>
+<%- end -%>
+<%- if @post_archive_retry_script != false -%>
+post_archive_retry_script = <%= @post_archive_retry_script %>
+<%- end -%>
+<%- if @post_archive_script != false -%>
+post_archive_script = <%= @post_archive_script %>
+<%- end -%>
+<%- if @post_backup_retry_script != false -%>
+post_backup_retry_script = <%= @post_backup_retry_script %>
 <%- end -%>
 <%- if @post_backup_script != false -%>
 post_backup_script = <%= @post_backup_script %>
 <%- end -%>
-<%- if @immediate_checkpoint != false -%>
-immediate_checkpoint = <%= @immediate_checkpoint %>
+<%- if @pre_archive_retry_script != false -%>
+pre_archive_retry_script = <%= @pre_archive_retry_script %>
 <%- end -%>
 <%- if @pre_archive_script != false -%>
 pre_archive_script = <%= @pre_archive_script %>
 <%- end -%>
-<%- if @post_archive_script != false -%>
-post_archive_script = <%= @post_archive_script %>
+<%- if @pre_backup_retry_script != false -%>
+pre_backup_retry_script = <%= @pre_backup_retry_script %>
+<%- end -%>
+<%- if @pre_backup_script != false -%>
+pre_backup_script = <%= @pre_backup_script %>
+<%- end -%>
+<%- if @immediate_checkpoint != false -%>
+immediate_checkpoint = <%= @immediate_checkpoint %>
 <%- end -%>
 <%- if @basebackup_retry_times != false -%>
 basebackup_retry_times = <%= @basebackup_retry_times %>
@@ -34,10 +73,24 @@ basebackup_retry_sleep = <%= @basebackup_retry_sleep %>
 <%- if @last_backup_maximum_age != false -%>
 last_backup_maximum_age = <%= @last_backup_maximum_age %>
 <%- end -%>
-backup_options = <%= @backup_options %>
-minimum_redundancy = <%= @minimum_redundancy %>
 retention_policy = <%= @retention_policy %>
 retention_policy_mode = <%= @retention_policy_mode %>
+<%- if @slot_name -%>
+slot_name = <%= @slot_name %>
+<%- end -%>
+streaming_archiver = <%= @streaming_archiver %>
+<%- if @streaming_archiver_batch_size -%>
+streaming_archiver_batch_size = <%= @streaming_archiver_batch_size %>
+<%- end -%>
+<%- if @streaming_archiver_name -%>
+streaming_archiver_name = <%= @streaming_archiver_name %>
+<%- end -%>
+<%- if @streaming_backup_name -%>
+streaming_backup_name = <%= @streaming_backup_name %>
+<%- end -%>
+<%- if @tablespace_bandwidth_limit -%>
+tablespace_bandwidth_limit = <%= @tablespace_bandwidth_limit %>
+<%- end -%>
 wal_retention_policy = <%= @wal_retention_policy %>
 <%- if @reuse_backup != false -%>
 reuse_backup = <%= @reuse_backup %>

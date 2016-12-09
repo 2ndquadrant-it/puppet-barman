@@ -19,16 +19,31 @@
 #            class.
 # [*logfile*] - A different log file. The default is
 #               '/var/log/barman/barman.log'
+# [*archiver*] - Whether the log shipping backup mechanism is active or not
+#                (defaults to true)
+# [*archiver_batch_size*] - Setting this option enables batch processing of WAL
+#                           files. The default processes all currently available
+#                           files.
+# [*backup_directory*] - Directory where backup data for a server will be placed.
+# [*backup_method*] - Configure the method barman used for backup execution. If
+#                     set to rsync (default), barman will execute backup using the
+#                     rsync command. If set to postgres barman will use the
+#                     pg_basebackup command to execute the backup.
+# [*backup_options*] - Behavior for backup operations: possible values are
+#                      exclusive_backup (default) and concurrent_backup.
+# [*bandwidth_limit*] - This option allows you to specify a maximum transfer rate
+#                       in kilobytes per second. A value of zero specifies no
+#                       limit (default).
+# [*check_timeout*] - Maximum execution time, in seconds per server, for a barman
+#                     check command. Set to 0 to disable the timeout. Positive
+#                     integer, default 30.
 # [*compression*] - Compression algorithm. Currently supports 'gzip' (default),
 #                   'bzip2', and 'custom'. Disabled if false.
-# [*pre_backup_script*] - Script to launch before backups. Disabled if false
-#                         (default).
-# [*post_backup_script*] - Script to launch after backups. Disabled if false
-#                          (default).
-# [*pre_archive_script*] - Script to launch before a WAL file is archived by
-#                          maintenance. Disabled if false (default).
-# [*post_archive_script*] - Script to launch after a WAL file is archived by
-#                          maintenance. Disabled if false (default).
+# [*custom_compression_filter*] - Customised compression algorithm applied to WAL
+#                                 files.
+# [*custom_decompression_filter*] - Customised decompression algorithm applied to
+#                                   compressed WAL files; this must match the
+#                                   compression algorithm.
 # [*immediate_checkpoint*] - Force the checkpoint on the Postgres server to
 #                            happen immediately and start your backup copy
 #                            process as soon as possible. Disabled if false
@@ -37,14 +52,53 @@
 #                              backup after an error. Default = 0
 # [*basebackup_retry_sleep*] - Number of seconds to wait after after a failed
 #                              copy, before retrying. Default = 30
-# [*backup_options*] - Behavior for backup operations: possible values are
-#                      exclusive_backup (default) and concurrent_backup
 # [*minimum_redundancy*] - Minimum number of required backups (redundancy).
 #                          Default = 0
+# [*network_compression*] - This option allows you to enable data compression for
+#                           network transfers. Defaults to false.
+# [*path_prefix*] - One or more absolute paths, separated by colon, where Barman
+#                   looks for executable files.
 # [*last_backup_maximum_age*] - Time frame that must contain the latest backup
 #                               date. If the latest backup is older than the
 #                               time frame, barman check command will report an
 #                               error to the user. Empty if false (default).
+# [*post_archive_retry_script*] - Hook script launched after a WAL file is
+#                                 archived by maintenance. Being this a retry hook
+#                                 script, Barman will retry the execution of the
+#                                 script until this either returns a SUCCESS (0),
+#                                 an ABORT_CONTINUE (62) or an ABORT_STOP (63)
+#                                 code. In a post archive scenario, ABORT_STOP has
+#                                 currently the same effects as ABORT_CONTINUE.
+# [*post_archive_script*] - Hook script launched after a WAL file is archived by
+#                           maintenance, after 'post_archive_retry_script'.
+# [*post_backup_retry_script*] - Hook script launched after a base backup. Being
+#                                this a retry hook script, Barman will retry the
+#                                execution of the script until this either returns
+#                                a SUCCESS (0), an ABORT_CONTINUE (62) or an
+#                                ABORT_STOP (63) code. In a post backup scenario,
+#                                ABORT_STOP has currently the same effects as
+#                                ABORT_CONTINUE.
+# [*post_backup_script*] - Hook script launched after a base backup, after
+#                          'post_backup_retry_script'.
+# [*pre_archive_retry_script*] - Hook script launched before a WAL file is
+#                                archived by maintenance, after
+#                                'pre_archive_script'. Being this a retry hook
+#                                script, Barman will retry the execution of the
+#                                script until this either returns a SUCCESS (0),
+#                                an ABORT_CONTINUE (62) or an ABORT_STOP (63)
+#                                code. Returning ABORT_STOP will propagate the
+#                                failure at a higher level and interrupt the WAL
+#                                archiving operation.
+# [*pre_archive_script*] - Hook script launched before a WAL file is archived by
+# 			   maintenance.
+# [*pre_backup_retry_script*] - Hook script launched before a base backup, after
+#                               'pre_backup_script'. Being this a retry hook
+#                               script, Barman will retry the execution of the
+#                               script until this either returns a SUCCESS (0), an
+#                               ABORT_CONTINUE (62) or an ABORT_STOP (63) code.
+#                               Returning ABORT_STOP will propagate the failure at
+#                               a higher level and interrupt the backup operation.
+# [*pre_backup_script*] - Hook script launched before a base backup.
 # [*retention_policy*] - Base backup retention policy, based on redundancy or
 #                        recovery window. Default empty (no retention enforced).
 #                        Value must be greater than or equal to the server
@@ -60,6 +114,41 @@
 #                    saves only data changes from the latest full backup
 #                    available in the catalogue for a specific PostgreSQL
 #                    server. Disabled if false. Default false.
+# [*slot_name*] - Physical replication slot to be used by the receive-wal
+#                 command when streaming_archiver is set to on. Requires
+#                 postgreSQL >= 9.4. Default: undef (disabled).
+# [*streaming_archiver*] - This option allows you to use the PostgreSQL's
+#                          streaming protocol to receive transaction logs from a
+#                          server. This activates connection checks as well as
+#                          management (including compression) of WAL files. If
+#                          set to off (default) barman will rely only on
+#                          continuous archiving for a server WAL archive
+#                          operations, eventually terminating any running
+#                          pg_receivexlog for the server.
+# [*streaming_archiver_batch_size*] - This option allows you to activate batch
+#                                     processing of WAL files for the
+#                                     streaming_archiver process, by setting it to
+#                                     a value > 0. Otherwise, the traditional
+#                                     unlimited processing of the WAL queue is
+#                                     enabled.
+# [*streaming_archiver_name*] - Identifier to be used as application_name by the
+#                               receive-wal command. Only available with
+#                               pg_receivexlog >= 9.3. By default it is set to
+#                               barman_receive_wal.
+# [*streaming_backup_name*] - Identifier to be used as application_name by the
+#                             pg_basebackup command. Only available with
+#                             pg_basebackup >= 9.3. By default it is set to
+#                             barman_streaming_backup.
+# [*streaming_conninfo*] - Connection string used by Barman to connect to the
+#                          Postgres server via streaming replication protocol. By
+#                          default it is set to the same value as *conninfo*.
+# [*streaming_wals_directory*] - Directory where WAL files are streamed from the
+#                                PostgreSQL server to Barman.
+# [*tablespace_bandwidth_limit*] - This option allows you to specify a maximum
+#                                  transfer rate in kilobytes per second, by
+#                                  specifying a comma separated list of
+#                                  tablespaces (pairs TBNAME:BWLIMIT). A value of
+#                                  zero specifies no limit (default).
 # [*custom_lines*] - DEPRECATED. Custom configuration directives (e.g. for
 #                    custom compression). Defaults to empty.
 # [*barman_fqdn*] - The fqdn of the Barman server. It will be exported in
@@ -127,35 +216,54 @@
 # Copyright 2012-2015 2ndQuadrant Italia (Devise.IT SRL)
 #
 class barman (
-  $user                    = $::barman::settings::user,
-  $group                   = $::barman::settings::group,
-  $ensure                  = 'present',
-  $conf_template           = 'barman/barman.conf.erb',
-  $logrotate_template      = 'barman/logrotate.conf.erb',
-  $barman_fqdn             = $::fqdn,
-  $home                    = $::barman::settings::home,
-  $logfile                 = $::barman::settings::logfile,
-  $compression             = $::barman::settings::compression,
-  $immediate_checkpoint    = $::barman::settings::immediate_checkpoint,
-  $pre_backup_script       = $::barman::settings::pre_backup_script,
-  $post_backup_script      = $::barman::settings::post_backup_script,
-  $pre_archive_script      = $::barman::settings::pre_archive_script,
-  $post_archive_script     = $::barman::settings::post_archive_script,
-  $basebackup_retry_times  = $::barman::settings::basebackup_retry_times,
-  $basebackup_retry_sleep  = $::barman::settings::basebackup_retry_sleep,
-  $backup_options          = $::barman::settings::backup_options,
-  $minimum_redundancy      = $::barman::settings::minimum_redundancy,
-  $last_backup_maximum_age = $::barman::settings::last_backup_maximum_age,
-  $retention_policy        = $::barman::settings::retention_policy,
-  $retention_policy_mode   = $::barman::settings::retention_policy_mode,
-  $wal_retention_policy    = $::barman::settings::wal_retention_policy,
-  $reuse_backup            = $::barman::settings::reuse_backup,
-  $custom_lines            = $::barman::settings::custom_lines,
-  $autoconfigure           = $::barman::settings::autoconfigure,
-  $manage_package_repo     = $::barman::settings::manage_package_repo,
-  $exported_ipaddress      = "${::ipaddress}/32",
-  $host_group              = $::barman::settings::host_group,
-  $purge_unknown_conf      = $::barman::settings::purge_unknown_conf,
+  $user                          = $::barman::settings::user,
+  $group                         = $::barman::settings::group,
+  $ensure                        = 'present',
+  $conf_template                 = 'barman/barman.conf.erb',
+  $logrotate_template            = 'barman/logrotate.conf.erb',
+  $barman_fqdn                   = $::fqdn,
+  $archiver                      = $::barman::settings::archiver,
+  $archiver_batch_size           = $::barman::settings::archiver_batch_size,
+  $autoconfigure                 = $::barman::settings::autoconfigure,
+  $backup_method                 = $::barman::settings::backup_method,
+  $backup_options                = $::barman::settings::backup_options,
+  $bandwidth_limit               = $::barman::settings::bandwidth_limit,
+  $basebackup_retry_sleep        = $::barman::settings::basebackup_retry_sleep,
+  $basebackup_retry_times        = $::barman::settings::basebackup_retry_times,
+  $check_timeout                 = $::barman::settings::check_timeout,
+  $compression                   = $::barman::settings::compression,
+  $custom_compression_filter     = $::barman::settings::custom_compression_filter,
+  $custom_decompression_filter   = $::barman::settings::custom_decompression_filter,
+  $exported_ipaddress            = "${::ipaddress}/32",
+  $home                          = $::barman::settings::home,
+  $host_group                    = $::barman::settings::host_group,
+  $immediate_checkpoint          = $::barman::settings::immediate_checkpoint,
+  $last_backup_maximum_age       = $::barman::settings::last_backup_maximum_age,
+  $logfile                       = $::barman::settings::logfile,
+  $manage_package_repo           = $::barman::settings::manage_package_repo,
+  $minimum_redundancy            = $::barman::settings::minimum_redundancy,
+  $network_compression           = $::barman::settings::network_compression,
+  $path_prefix                   = $::barman::settings::path_prefix,
+  $post_archive_retry_script     = $::barman::settings::post_archive_retry_script,
+  $post_archive_script           = $::barman::settings::post_archive_script,
+  $post_backup_retry_script      = $::barman::settings::post_backup_retry_script,
+  $post_backup_script            = $::barman::settings::post_backup_script,
+  $pre_archive_retry_script      = $::barman::settings::pre_archive_retry_script,
+  $pre_archive_script            = $::barman::settings::pre_archive_script,
+  $pre_backup_retry_script       = $::barman::settings::pre_backup_retry_script,
+  $pre_backup_script             = $::barman::settings::pre_backup_script,
+  $purge_unknown_conf            = $::barman::settings::purge_unknown_conf,
+  $retention_policy              = $::barman::settings::retention_policy,
+  $retention_policy_mode         = $::barman::settings::retention_policy_mode,
+  $reuse_backup                  = $::barman::settings::reuse_backup,
+  $slot_name                     = $::barman::settings::slot_name,
+  $streaming_archiver            = $::barman::settings::streaming_archiver,
+  $streaming_archiver_batch_size = $::barman::settings::streaming_archiver_batch_size,
+  $streaming_archiver_name       = $::barman::settings::streaming_archiver_name,
+  $streaming_backup_name         = $::barman::settings::streaming_backup_name,
+  $tablespace_bandwidth_limit    = $::barman::settings::tablespace_bandwidth_limit,
+  $wal_retention_policy          = $::barman::settings::wal_retention_policy,
+  $custom_lines                  = $::barman::settings::custom_lines,
 ) inherits barman::settings {
 
   # Check if autoconfigure is a boolean
@@ -165,7 +273,7 @@ class barman (
   validate_re($minimum_redundancy, [ '^[0-9]+$' ])
 
   # Check if backup_options has correct values
-  validate_re($backup_options, [ '^exclusive_backup$', '^concurrent_backup$', 'Invalid backup option please use exclusive_backup or concurrent_backup' ])
+  validate_re($backup_options, [ '^exclusive_backup$', '^concurrent_backup$'], 'Invalid backup option please use exclusive_backup or concurrent_backup')
 
   # Check if immediate checkpoint is a boolean
   validate_bool($immediate_checkpoint)
@@ -192,6 +300,62 @@ class barman (
 
   # Check to make sure wal_retention_policy is set to main
   validate_re($wal_retention_policy, [ '^main$' ])
+
+  validate_bool($archiver)
+
+  if $archiver_batch_size != undef {
+    validate_integer($archiver_batch_size)
+  }
+
+  if $backup_method != undef {
+    validate_re($backup_method, '^(rsync|postgres)$')
+  }
+
+  if $bandwidth_limit != undef {
+    validate_integer($bandwidth_limit)
+  }
+
+  if $check_timeout != undef {
+    validate_integer($check_timeout)
+  }
+
+  if $custom_compression_filter != undef {
+    validate_string($custom_compression_filter)
+  }
+
+  if $custom_decompression_filter != undef {
+    validate_string($custom_decompression_filter)
+  }
+
+  if $network_compression != undef {
+    validate_bool($network_compression)
+  }
+
+  if $path_prefix != undef {
+    validate_absolute_path($path_prefix)
+  }
+
+  if $slot_name != undef {
+    validate_string($slot_name)
+  }
+
+  validate_bool($streaming_archiver)
+
+  if $streaming_archiver_batch_size != undef {
+    validate_integer($streaming_archiver_batch_size)
+  }
+
+  if $streaming_archiver_name != undef {
+    validate_string($streaming_archiver_name)
+  }
+
+  if $streaming_backup_name != undef {
+    validate_string($streaming_backup_name)
+  }
+
+  if $tablespace_bandwidth_limit != undef {
+    validate_string($tablespace_bandwidth_limit)
+  }
 
   # Check to make sure reuse_backup has correct value
   if $reuse_backup != false {
