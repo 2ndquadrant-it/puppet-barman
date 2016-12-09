@@ -30,6 +30,8 @@
 #                password.
 # [*server_address*] - The whole fqdn of the PostgreSQL server used in Barman
 #                      'ssh_command' (automatically configured by Puppet).
+# [*server_port*] - The port used by PostgreSQL for receiving connections
+#                   (default: 5432)
 # [*postgres_server_id*] - Id of the PostgreSQL server, given by its host name
 #                          (automatically configured by Puppet).
 # [*postgres_user*] - The PostgreSQL user used in Barman 'ssh_command'.
@@ -230,6 +232,7 @@ class barman::postgres (
   $backup_minute                 = 0,
   $password                      = '',
   $server_address                = $::fqdn,
+  $server_port                   = 5432,
   $postgres_server_id            = $::hostname,
   $postgres_user                 = 'postgres',
   $ensure                        = 'present',
@@ -315,7 +318,7 @@ class barman::postgres (
 
   # Export resources to Barman server
   @@barman::server { $postgres_server_id:
-    conninfo                      => "user=${barman_dbuser} dbname=${barman_dbname} host=${server_address}",
+    conninfo                      => "user=${barman_dbuser} dbname=${barman_dbname} host=${server_address} port=${server_port}",
     ssh_command                   => "ssh ${postgres_user}@${server_address}",
     tag                           => "barman-${host_group}",
     archiver                      => $archiver,
@@ -375,7 +378,7 @@ class barman::postgres (
   # Fill the .pgpass file
   @@file_line { "barman_pgpass_content-${::hostname}":
     path => "${barman_home}/.pgpass",
-    line => "${server_address}:*:${barman_dbname}:${barman_dbuser}:${real_password}",
+    line => "${server_address}:${server_port}:${barman_dbname}:${barman_dbuser}:${real_password}",
     tag  => "barman-${host_group}",
   }
 
