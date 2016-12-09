@@ -310,7 +310,14 @@ class barman::postgres (
     postgres_server_id => $postgres_server_id,
   }
 
-  Postgresql::Server::Pg_hba_rule <<| tag == "barman-${host_group}" |>>
+  $_hba_dbname = $streaming_archiver ? {
+      true  => 'replication',
+      false => $barman_dbname,
+  }
+
+  Postgresql::Server::Pg_hba_rule <<| tag == "barman-${host_group}" |>> {
+    database => $_hba_dbname,
+  }
 
   Ssh_authorized_key <<| tag == "barman-${host_group}" |>> {
     require => Class['postgresql::server'],
@@ -380,6 +387,13 @@ class barman::postgres (
     path => "${barman_home}/.pgpass",
     line => "${server_address}:${server_port}:${barman_dbname}:${barman_dbuser}:${real_password}",
     tag  => "barman-${host_group}",
+  }
+  if $streaming_archiver {
+    @@file_line { "barman_pgpass_content-${::hostname}-replication":
+      path => "${barman_home}/.pgpass",
+      line => "${server_address}:${server_port}:replication:${barman_dbuser}:${real_password}",
+      tag  => "barman-${host_group}",
+    }
   }
 
   # Ssh key of 'postgres' user in PostgreSQL server
