@@ -4,6 +4,7 @@ describe 'barman' do
 
   let(:facts) do
     {
+      :puppetversion => `puppet --version`,
       :osfamily => 'Debian',
       :operatingsystem => 'Debian',
       :operatingsystemrelease => '6.0',
