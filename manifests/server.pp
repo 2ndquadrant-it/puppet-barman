@@ -368,7 +368,7 @@ define barman::server (
         user        => $barman::settings::dbuser,
         address     => $barman::autoconfigure::exported_ipaddress,
         auth_method => 'md5',
-        tag         => "barman-${host_group}",
+        tag         => "barman-${barman::host_group}",
       }
     }
     @@postgresql::server::pg_hba_rule { "barman ${::hostname} client access":
@@ -378,7 +378,7 @@ define barman::server (
       user        => $barman::settings::dbuser,
       address     => $barman::autoconfigure::exported_ipaddress,
       auth_method => 'md5',
-      tag         => "barman-${host_group}",
+      tag         => "barman-${barman::host_group}",
     }
   }
 
