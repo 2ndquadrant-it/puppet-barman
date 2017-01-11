@@ -208,16 +208,13 @@
 # * Francesco Canovai <francesco.canovai@2ndQuadrant.it>
 # * Marco Nenciarini <marco.nenciarini@2ndQuadrant.it>
 # * Gabriele Bartolini <gabriele.bartolini@2ndQuadrant.it>
+# * Alessandro Grassi <alessandro.grassi@2ndQuadrant.it>
 #
 # Many thanks to Alessandro Franceschi <al@lab42.it>
 #
-# === Past authors
-#
-# Alessandro Grassi <alessandro.grassi@devise.it>
-#
 # === Copyright
 #
-# Copyright 2012-2015 2ndQuadrant Italia (Devise.IT SRL)
+# Copyright 2012-2017 2ndQuadrant Italia
 #
 class barman::postgres (
   $host_group                    = $::barman::settings::host_group,

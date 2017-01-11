@@ -700,14 +700,11 @@ This module is distributed under GNU GPLv3.
 * Francesco Canovai <francesco.canovai@2ndQuadrant.it>
 * Marco Nenciarini <marco.nenciarini@2ndQuadrant.it>
 * Gabriele Bartolini <gabriele.bartolini@2ndQuadrant.it>
+* Alessandro Grassi <alessandro.grassi@2ndQuadrant.it>
 
 Many thanks to Alessandro Franceschi <al@lab42.it> for his intensive course
 on Puppet and the ideas he brought to this module.
 
-### Past authors
-
-* Alessandro Grassi <alessandro.grassi@devise.it>
-
 ### Copyright
 
-Copyright 2012-2015 2ndQuadrant Italia (Devise.IT SRL)
+Copyright 2012-2017 2ndQuadrant Italia
