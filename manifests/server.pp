@@ -361,4 +361,28 @@ define barman::server (
     subscribe   => File["/etc/barman.conf.d/${name}.conf"],
     refreshonly => true
   }
+  if($barman::autoconfigure) {
+    # export configuration for the pg_hba.conf
+    if ($streaming_archiver or $backup_method == 'postgres') {
+      @@postgresql::server::pg_hba_rule { "barman ${::hostname} client access (replication)":
+        description => "barman ${::hostname} client access",
+        type        => 'host',
+        database    => 'replication',
+        user        => $barman::settings::dbuser,
+        address     => $barman::autoconfigure::exported_ipaddress,
+        auth_method => 'md5',
+        tag         => "barman-${host_group}",
+      }
+    }
+    @@postgresql::server::pg_hba_rule { "barman ${::hostname} client access":
+      description => "barman ${::hostname} client access",
+      type        => 'host',
+      database    => $barman::settings::dbname,
+      user        => $barman::settings::dbuser,
+      address     => $barman::autoconfigure::exported_ipaddress,
+      auth_method => 'md5',
+      tag         => "barman-${host_group}",
+    }
+  }
+
 }

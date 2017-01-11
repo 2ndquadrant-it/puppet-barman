@@ -310,14 +310,7 @@ class barman::postgres (
     postgres_server_id => $postgres_server_id,
   }
 
-  $_hba_dbname = $streaming_archiver ? {
-      true  => 'replication',
-      false => $barman_dbname,
-  }
-
-  Postgresql::Server::Pg_hba_rule <<| tag == "barman-${host_group}" |>> {
-    database => $_hba_dbname,
-  }
+  Postgresql::Server::Pg_hba_rule <<| tag == "barman-${host_group}" |>>
 
   Ssh_authorized_key <<| tag == "barman-${host_group}" |>> {
     require => Class['postgresql::server'],

@@ -11,7 +11,7 @@ require 'puppet-lint/tasks/puppet-lint'
 Rake::Task[:lint].clear
 PuppetLint::RakeTask.new :lint do |config|
   config.disable_checks = ["80chars", "140chars"]
-  config.ignore_paths = ["spec/**/*.pp", "pkg/**/*.pp"]
+  config.ignore_paths = ["spec/**/*.pp", "pkg/**/*.pp", "vendor/**"]
   config.fail_on_warnings = true
   # Workaround for missing "relative" accessor
   #config.relative = true
