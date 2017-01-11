@@ -1,7 +1,15 @@
+##2017-01-11 - Release 2.0.0
+
+###Summary
+
+Module update to support barman 2.x (thanks to Leo Antunes)
+
+This release may break compatibility with puppet < 4
+
 ##2015-03-24 - Release 1.0.0
 ###Summary
 
-Mayor improvement in auticonfiguration module.
+Major improvements in autoconfiguration module.
 
 This release changes the default value of `manage_package_repo`
 parameter to `false`.
