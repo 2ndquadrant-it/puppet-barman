@@ -1,6 +1,6 @@
 require 'etc'
 
-def safe_keygen_and_return (user)
+def barman_safe_keygen_and_return (user)
   Etc.passwd { |entry|
     if entry.name == user
       if File.exists? "#{entry.dir}/.ssh/id_rsa.pub"
@@ -22,13 +22,13 @@ end
 Facter.add('barman_key') do
   confine :kernel => 'Linux'
   setcode do
-    safe_keygen_and_return('barman')
+    barman_safe_keygen_and_return('barman')
   end
 end
 
 Facter.add('postgres_key') do
   confine :kernel => 'Linux'
   setcode do
-    safe_keygen_and_return('postgres')
+    barman_safe_keygen_and_return('postgres')
   end
 end
