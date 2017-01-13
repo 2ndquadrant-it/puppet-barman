@@ -35,10 +35,10 @@ module path.
 
 ### barman
 
-The `barman` class installs Barman. Currently only Ubuntu and Debian are
-supported.
+The `barman` class installs Barman.
 
-Intensive testing has only been done on Ubuntu 12.04 LTS.
+> **IMPORTANT:** Currently only Ubuntu and Debian distributions
+> are supported.
 
 In order to install Barman with the default options, it is sufficient to just
 include the barman class:
@@ -58,13 +58,13 @@ module.
     }->
     class { 'barman': }
 
-**Note:** In versions of `it2ndq/barman' > 2.1, setup of PGDG
-repository can be done automatically by setting the
-`manage\_package\_repo` parameter to to `true`. It will be implemented
-internally by declaring the `postgresql::globals` class. If you need
-to customize the `postgresql::globals` class declaration, keep the
-`manage\_package\_repo` parameter disabled in `barman` module and enable
-it directly in `postgresql::globals` class.
+> **Note:** In versions of `it2ndq/barman' > 2.1, setup of PGDG
+> Repository can be done automatically by setting the
+> `manage\_package\_repo` parameter to to `true`. It will be implemented
+> Internally by declaring the `postgresql::globals` class. If you need
+> To customize the `postgresql::globals` class declaration, keep the
+> `manage\_package\_repo` parameter disabled in `barman` module and enable
+> It directly in `postgresql::globals` class.
 
 All the configuration options that Barman accepts can be defined through Puppet.
 
@@ -308,9 +308,9 @@ Example:
       post_backup_script => '/usr/bin/touch /tmp/stopped',
     }
 
-**Note**: it is not recommended to specify passwords in the `conninfo`
-option (especially the ones for the `postgres` user). Use a password
-file instead (known as `~/.pgpass` file).
+> **Note**: it is not recommended to specify passwords in the `conninfo`
+> option (especially the ones for the `postgres` user). Use a password
+> file instead (known as `~/.pgpass` file).
 
 #### Parameters
 
@@ -699,8 +699,8 @@ This module is distributed under GNU GPLv3.
 * Giulio Calacoci <giulio.calacoci@2ndQuadrant.it>
 * Francesco Canovai <francesco.canovai@2ndQuadrant.it>
 * Marco Nenciarini <marco.nenciarini@2ndQuadrant.it>
-* Gabriele Bartolini <gabriele.bartolini@2ndQuadrant.it>
 * Alessandro Grassi <alessandro.grassi@2ndQuadrant.it>
+* Gabriele Bartolini <gabriele.bartolini@2ndQuadrant.it>
 
 Many thanks to Alessandro Franceschi <al@lab42.it> for his intensive course
 on Puppet and the ideas he brought to this module.
