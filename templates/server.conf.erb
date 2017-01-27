@@ -79,6 +79,9 @@ retention_policy_mode = <%= @retention_policy_mode %>
 slot_name = <%= @slot_name %>
 <%- end -%>
 streaming_archiver = <%= @streaming_archiver %>
+<%- if @streaming_conninfo -%>
+streaming_conninfo = <%= @streaming_conninfo %>
+<%- end -%>
 <%- if @streaming_archiver_batch_size -%>
 streaming_archiver_batch_size = <%= @streaming_archiver_batch_size %>
 <%- end -%>
