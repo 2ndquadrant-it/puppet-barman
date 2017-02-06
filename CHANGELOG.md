@@ -1,3 +1,14 @@
+##2017-02-06 - Release 2.0.1
+
+###Summary
+Fixed a couple outstanding bugs.
+Thanks to mzsamantha and James Miller.
+
+#### Bugfixes
+
+- streaming_conninfo missing from server template
+- allow _ in server names
+
 ##2017-01-11 - Release 2.0.0
 
 ###Summary
