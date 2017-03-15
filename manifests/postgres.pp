@@ -53,6 +53,8 @@
 #                     pg_basebackup command to execute the backup.
 # [*backup_options*] - Behavior for backup operations: possible values are
 #                      exclusive_backup (default) and concurrent_backup.
+# [*recovery_options*] - The restore command to write in the recovery.conf.
+#                        Possible values are 'get-wal' and undef. Default: undef.
 # [*bandwidth_limit*] - This option allows you to specify a maximum transfer rate
 #                       in kilobytes per second. A value of zero specifies no
 #                       limit (default).
@@ -263,6 +265,7 @@ class barman::postgres (
   $pre_archive_script            = $::barman::pre_archive_script,
   $pre_backup_retry_script       = $::barman::pre_backup_retry_script,
   $pre_backup_script             = $::barman::pre_backup_script,
+  $recovery_options              = $::barman::settings::recovery_options,
   $retention_policy              = $::barman::retention_policy,
   $retention_policy_mode         = $::barman::retention_policy_mode,
   $reuse_backup                  = $::barman::reuse_backup,

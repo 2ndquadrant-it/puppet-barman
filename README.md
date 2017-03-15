@@ -189,6 +189,8 @@ These are the available parameters for the `barman` class
                                 will report an error to the user. Empty if
                                 false. Defaults to
                                 `barman::settings::last\_backup\_maximum\_age`.
+* **recovery_options** - The restore_command to write in the recovery.conf.
+                         Possible values are 'get-wal' and undef. Default: undef.
 * **retention_policy** - Base backup retention policy, based on redundancy or
                          recovery window. Value must be greater than or equal
                          to the server minimum redundancy level. If this
@@ -387,6 +389,8 @@ The following parameters are unique to the `server` class:
                       pg_basebackup command to execute the backup.
 * **backup_options** - Behavior for backup operations: possible values are
                        exclusive_backup (default) and concurrent_backup
+* **recovery_options** - The restore command to write in the recovery.conf.
+                         Possible values are 'get-wal' and undef. Default: undef.
 * **bandwidth_limit** - This option allows you to specify a maximum transfer rate
                         in kilobytes per second. A value of zero specifies no
                         limit (default).
@@ -611,6 +615,8 @@ More details in the **postgres.pp** file.
                       pg_basebackup command to execute the backup.
 * **backup_options** - Behavior for backup operations: possible values are
                        exclusive_backup (default) and concurrent_backup
+* **recovery_options** - The restore command to write in the recovery.conf.
+                         Possible values are 'get-wal' and undef. Default: undef.
 * **bandwidth_limit** - This option allows you to specify a maximum transfer rate
                         in kilobytes per second. A value of zero specifies no
                         limit (default).

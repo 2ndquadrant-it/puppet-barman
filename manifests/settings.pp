@@ -72,6 +72,7 @@ class barman::settings (
   $pre_archive_script            = false,
   $pre_backup_retry_script       = false,
   $pre_backup_script             = false,
+  $recovery_options              = undef,
   $retention_policy              = '',
   $retention_policy_mode         = 'auto',
   $reuse_backup                  = false,

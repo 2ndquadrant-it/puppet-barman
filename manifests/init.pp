@@ -31,6 +31,8 @@
 #                     pg_basebackup command to execute the backup.
 # [*backup_options*] - Behavior for backup operations: possible values are
 #                      exclusive_backup (default) and concurrent_backup.
+# [*recovery_options*] - The restore command to write in the recovery.conf.
+#                        Possible values are 'get-wal' and undef. Default: undef.
 # [*bandwidth_limit*] - This option allows you to specify a maximum transfer rate
 #                       in kilobytes per second. A value of zero specifies no
 #                       limit (default).
@@ -250,6 +252,7 @@ class barman (
   $pre_backup_retry_script       = $::barman::settings::pre_backup_retry_script,
   $pre_backup_script             = $::barman::settings::pre_backup_script,
   $purge_unknown_conf            = $::barman::settings::purge_unknown_conf,
+  $recovery_options              = $::barman::settings::recovery_options,
   $retention_policy              = $::barman::settings::retention_policy,
   $retention_policy_mode         = $::barman::settings::retention_policy_mode,
   $reuse_backup                  = $::barman::settings::reuse_backup,
@@ -271,6 +274,11 @@ class barman (
 
   # Check if backup_options has correct values
   validate_re($backup_options, [ '^exclusive_backup$', '^concurrent_backup$'], 'Invalid backup option please use exclusive_backup or concurrent_backup')
+
+  if($recovery_options) {
+    # Check if recovery has correct values, if specified
+    validate_re($recovery_options, [ '^get-wal$' ], 'Invalid recovery option. Please use "get-wal" or undef.')
+  }
 
   # Check if immediate checkpoint is a boolean
   validate_bool($immediate_checkpoint)

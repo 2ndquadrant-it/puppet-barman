@@ -15,6 +15,9 @@ archiver_batch_size = <%= @archiver_batch_size %>
 backup_method = <%= @backup_method %>
 <%- end -%>
 backup_options = <%= @backup_options %>
+<%- if @recovery_options -%>
+recovery_options = <%= @recovery_options %>
+<%- end -%>
 <%- if @bandwidth_limit -%>
 bandwidth_limit = <%= @bandwidth_limit %>
 <%- end -%>
