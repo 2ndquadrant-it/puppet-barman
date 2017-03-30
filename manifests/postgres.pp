@@ -389,8 +389,9 @@ class barman::postgres (
     }
   }
 
-  if $archive {
-    # If barman is set to archive, export the ssh key of postgres user into barman
+  if $archiver {
+    # If barman archiver is enabled, export the ssh key of postgres user
+    # into barman
     if ($::postgres_key != undef and $::postgres_key != '') {
       $postgres_key_split = split($::postgres_key, ' ')
       @@ssh_authorized_key { "postgres-${::hostname}":
