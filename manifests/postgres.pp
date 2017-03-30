@@ -389,15 +389,17 @@ class barman::postgres (
     }
   }
 
-  # Ssh key of 'postgres' user in PostgreSQL server
-  if ($::postgres_key != undef and $::postgres_key != '') {
-    $postgres_key_splitted = split($::postgres_key, ' ')
-    @@ssh_authorized_key { "postgres-${::hostname}":
-      ensure => present,
-      user   => $barman_user,
-      type   => $postgres_key_splitted[0],
-      key    => $postgres_key_splitted[1],
-      tag    => "barman-${host_group}-postgresql",
+  if $archive {
+    # If barman is set to archive, export the ssh key of postgres user into barman
+    if ($::postgres_key != undef and $::postgres_key != '') {
+      $postgres_key_split = split($::postgres_key, ' ')
+      @@ssh_authorized_key { "postgres-${::hostname}":
+        ensure => present,
+        user   => $barman_user,
+        type   => $postgres_key_split[0],
+        key    => $postgres_key_split[1],
+        tag    => "barman-${host_group}-postgresql",
+      }
     }
   }
 }
