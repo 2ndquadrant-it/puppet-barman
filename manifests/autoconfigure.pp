@@ -69,12 +69,25 @@ class barman::autoconfigure (
     require => Class['barman'],
   }
 
+  Sshkey <<| tag == "barman-${host_group}-postgresql" |>> {
+    require => Class['barman'],
+  }
+
   ############## Export resources to Postgres Servers
 
   # export the archive command
   @@barman::archive_command { $::barman::barman_fqdn :
     tag         => "barman-${host_group}",
     barman_home => $barman::home,
+  }
+
+  @@sshkey { "barman-${::fqdn}":
+    ensure       => present,
+    host_aliases => [$::hostname, $::fqdn, $::ipaddress],
+    key          => $::sshecdsakey,
+    type         => 'ecdsa-sha2-nistp256',
+    target       => '/var/lib/postgresql/.ssh/known_hosts',
+    tag          => "barman-${host_group}",
   }
 
   # export the 'barman' SSH key - create if not present
