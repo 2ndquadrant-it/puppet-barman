@@ -306,10 +306,6 @@ class barman::postgres (
   }
 
   # Collect resources exported by Barman server
-  Barman::Archive_command <<| tag == "barman-${host_group}" |>> {
-    postgres_server_id => $postgres_server_id,
-  }
-
   Postgresql::Server::Pg_hba_rule <<| tag == "barman-${host_group}" |>>
 
   Ssh_authorized_key <<| tag == "barman-${host_group}" |>> {
@@ -391,7 +387,7 @@ class barman::postgres (
 
   if $archiver {
     # If barman archiver is enabled, export the ssh key of postgres user
-    # into barman
+    # into barman and set the archive command
     if ($::postgres_key != undef and $::postgres_key != '') {
       $postgres_key_split = split($::postgres_key, ' ')
       @@ssh_authorized_key { "postgres-${::hostname}":
@@ -402,5 +398,9 @@ class barman::postgres (
         tag    => "barman-${host_group}-postgresql",
       }
     }
+    Barman::Archive_command <<| tag == "barman-${host_group}" |>> {
+      postgres_server_id => $postgres_server_id,
+    }
+
   }
 }
