@@ -26,6 +26,8 @@ describe 'barman' do
 
   # Creates barman home and launches 'barman check all'
   it { is_expected.to contain_file('/var/lib/barman') }
+  it { is_expected.to contain_file('/var/lib/barman/.ssh').with_ensure('directory') }
+  it { is_expected.to contain_file('/var/lib/barman/.ssh/known_hosts') }
   it { is_expected.to contain_exec('barman-check-all') }
 
   # Creates the new home and launches barman check all
@@ -37,6 +39,8 @@ describe 'barman' do
     end
 
     it { is_expected.to contain_file('/srv/barman').with_ensure('directory') }
+    it { is_expected.to contain_file('/srv/barman/.ssh').with_ensure('directory') }
+    it { is_expected.to contain_file('/srv/barman/.ssh/known_hosts') }
     it { is_expected.to contain_exec('barman-check-all') }
   end
 

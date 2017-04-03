@@ -389,6 +389,15 @@ class barman::postgres (
     }
   }
 
+  @@sshkey { "postgres-${::hostname}":
+    ensure       => present,
+    host_aliases => [$::hostname, $::fqdn, $::ipaddress],
+    key          => $::sshecdsakey,
+    type         => 'ecdsa-sha2-nistp256',
+    target       => "${barman_home}/.ssh/known_hosts",
+    tag          => "barman-${host_group}-postgresql",
+  }
+
   if $archiver {
     # If barman archiver is enabled, export the ssh key of postgres user
     # into barman
