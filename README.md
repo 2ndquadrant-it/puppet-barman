@@ -512,7 +512,7 @@ More details in the **autoconfigure.pp** file.
                    (default value is set from the `settings` class).
 
 * **exported_ipaddress** - The barman server address to allow in the PostgreSQL
-                           server ph_hba.conf. Defaults to `${::ipaddress}/32`.
+                           server pg_hba.conf. Defaults to `${::ipaddress}/32`.
 
 ### barman::postgres
 
