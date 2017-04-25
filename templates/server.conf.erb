@@ -101,6 +101,9 @@ wal_retention_policy = <%= @wal_retention_policy %>
 <%- if @reuse_backup != false -%>
 reuse_backup = <%= @reuse_backup %>
 <%- end -%>
+<%- if @backup_directory -%>
+backup_directory = <%= @backup_directory %>
+<%- end -%>
 <%- if @custom_lines -%>
 <%= @custom_lines %>
 <%- end -%>
