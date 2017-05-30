@@ -58,6 +58,8 @@
 #                          Default = 0
 # [*network_compression*] - This option allows you to enable data compression for
 #                           network transfers. Defaults to false.
+# [*parallel_jobs] - Number of parallel workers used to copy files during
+#                    backup or recovery. Requires backup mode = rsync.
 # [*path_prefix*] - One or more absolute paths, separated by colon, where Barman
 #                   looks for executable files.
 # [*last_backup_maximum_age*] - Time frame that must contain the latest backup
@@ -242,6 +244,7 @@ class barman (
   $manage_package_repo           = $::barman::settings::manage_package_repo,
   $minimum_redundancy            = $::barman::settings::minimum_redundancy,
   $network_compression           = $::barman::settings::network_compression,
+  $parallel_jobs                 = $::barman::settings::parallel_jobs,
   $path_prefix                   = $::barman::settings::path_prefix,
   $post_archive_retry_script     = $::barman::settings::post_archive_retry_script,
   $post_archive_script           = $::barman::settings::post_archive_script,
@@ -334,6 +337,10 @@ class barman (
 
   if $network_compression != undef {
     validate_bool($network_compression)
+  }
+
+  if $parallel_jobs != undef {
+    validate_integer($parallel_jobs)
   }
 
   if $path_prefix != undef {

@@ -37,6 +37,9 @@ minimum_redundancy = <%= @minimum_redundancy %>
 <%- if @network_compression -%>
 network_compression = <%= @network_compression %>
 <%- end -%>
+<%- if @parallel_jobs -%>
+parallel_jobs = <%= @parallel_jobs %>
+<%- end -%>
 <%- if @path_prefix -%>
 path_prefix = <%= @path_prefix %>
 <%- end -%>

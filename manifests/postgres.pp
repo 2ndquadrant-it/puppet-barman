@@ -94,6 +94,8 @@
 # [*minimum_redundancy*] - Minimum number of backups to be retained. Default 0.
 # [*network_compression*] - This option allows you to enable data compression for
 #                           network transfers. Defaults to false.
+# [*parallel_jobs] - Number of parallel workers used to copy files during
+#                    backup or recovery. Requires backup mode = rsync.
 # [*path_prefix*] - One or more absolute paths, separated by colon, where Barman
 #                   looks for executable files.
 # [*post_archive_retry_script*] - Hook script launched after a WAL file is
@@ -256,6 +258,7 @@ class barman::postgres (
   $last_backup_maximum_age       = $::barman::last_backup_maximum_age,
   $minimum_redundancy            = $::barman::minimum_redundancy,
   $network_compression           = $::barman::network_compression,
+  $parallel_jobs                 = $::barman::parallel_jobs,
   $path_prefix                   = $::barman::path_prefix,
   $post_archive_retry_script     = $::barman::post_archive_retry_script,
   $post_archive_script           = $::barman::post_archive_script,
@@ -337,6 +340,7 @@ class barman::postgres (
     minimum_redundancy            => $minimum_redundancy,
     network_compression           => $network_compression,
     path_prefix                   => $path_prefix,
+    parallel_jobs                 => $parallel_jobs,
     post_archive_retry_script     => $post_archive_retry_script,
     post_archive_script           => $post_archive_script,
     post_backup_retry_script      => $post_backup_retry_script,

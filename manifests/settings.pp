@@ -63,6 +63,7 @@ class barman::settings (
   $logfile                       = '/var/log/barman/barman.log',
   $minimum_redundancy            = '0',
   $network_compression           = undef,
+  $parallel_jobs                 = undef,
   $path_prefix                   = undef,
   $post_archive_retry_script     = false,
   $post_archive_script           = false,
