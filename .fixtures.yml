@@ -2,6 +2,8 @@ fixtures:
   repositories:
     stdlib: git://github.com/puppetlabs/puppetlabs-stdlib.git
     postgresql: git://github.com/puppetlabs/puppetlabs-postgresql.git
-    apt: git://github.com/puppetlabs/puppetlabs-apt.git
+    apt:
+      repo: git://github.com/puppetlabs/puppetlabs-apt.git
+      branch: 2.2.x
   symlinks:
     barman: "#{source_dir}"
