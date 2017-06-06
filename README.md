@@ -85,6 +85,22 @@ Parameters can be set in three places:
 * **barman** - set the global values for the Barman server.
 * **barman::server** - set the per PostgreSQL server values.
 
+Parameters for can also be set in hiera yaml:
+
+    barman::autoconfigure: true
+    barman::dbuser: 'postgres'
+    barman::dbname: 'postgres'
+    barman::compression: 'gzip'
+
+    barman::servers:
+      servername:
+        ssh_command: 'ssh postgres@example.org -q'
+        conninfo: 'host=%{fqdn} dbname=thegoods user=backup password=passwordstring'
+        compression: 'gzip'
+        backup_options: 'concurrent_backup'
+        retention_policy: 'RECOVERY WINDOW OF 5 DAYS'
+        archiver: true
+
 These are the available parameters for the `barman` class
 
 * **user** - The Barman user. Defaults to `barman::settings::user`.
