@@ -425,6 +425,21 @@ class barman (
     require => Package['barman']
   }
 
+  file { "${home}/.ssh":
+    ensure  => directory,
+    owner   => $user,
+    group   => $group,
+    mode    => '0700',
+    require => File[$home],
+  }
+
+  file { "${home}/.ssh/known_hosts":
+    ensure => present,
+    owner  => $user,
+    group  => $group,
+    mode   => '0600',
+  }
+
   # Run 'barman check all' to create Barman backup directories
   exec { 'barman-check-all':
     command     => '/usr/bin/barman check all',
