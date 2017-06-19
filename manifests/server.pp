@@ -11,7 +11,7 @@
 #
 # [*conninfo*] - Postgres connection string. *Mandatory*.
 # [*ssh_command*] - Command to open an ssh connection to Postgres. *Mandatory*.
-# [*activate*] - Whether this server is active in the barman configuration.
+# [*active*] - Whether this server is active in the barman configuration.
 # [*ensure*] - Ensure (or not) that single server Barman configuration files are
 #              created. The default value is 'present'. Just 'absent' or
 #              'present' are the possible settings.
@@ -289,6 +289,7 @@ define barman::server (
   # check to make sure wal_retention_policy is set to main
   validate_re($wal_retention_policy, [ '^main$' ])
 
+  validate_bool($active)
   validate_bool($archiver)
 
   if $archiver_batch_size != undef {
