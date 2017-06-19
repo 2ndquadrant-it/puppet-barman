@@ -173,6 +173,9 @@
 #                           `manage_package_repo` parameter disabled in `barman`
 #                           module and enable it directly in
 #                           `postgresql::globals` class.
+# [*manage_ssh_host_keys*] - When using autoconfigure, ensure the hosts contain
+#                            each other ssh host key. Must also be set on
+#                            'barman::postgres' class. Defaults to false.
 # [*purge_unknown_conf*] - Whether or not barman conf files not included in
 #                          puppetdb will be removed by puppet.
 #
@@ -242,6 +245,7 @@ class barman (
   $last_backup_maximum_age       = $::barman::settings::last_backup_maximum_age,
   $logfile                       = $::barman::settings::logfile,
   $manage_package_repo           = $::barman::settings::manage_package_repo,
+  $manage_ssh_host_keys          = $::barman::settings::manage_ssh_host_keys,
   $minimum_redundancy            = $::barman::settings::minimum_redundancy,
   $network_compression           = $::barman::settings::network_compression,
   $parallel_jobs                 = $::barman::settings::parallel_jobs,
@@ -425,19 +429,21 @@ class barman (
     require => Package['barman']
   }
 
-  file { "${home}/.ssh":
-    ensure  => directory,
-    owner   => $user,
-    group   => $group,
-    mode    => '0700',
-    require => File[$home],
-  }
+  if $manage_ssh_host_keys {
+    file { "${home}/.ssh":
+      ensure  => directory,
+      owner   => $user,
+      group   => $group,
+      mode    => '0700',
+      require => File[$home],
+    }
 
-  file { "${home}/.ssh/known_hosts":
-    ensure => present,
-    owner  => $user,
-    group  => $group,
-    mode   => '0600',
+    file { "${home}/.ssh/known_hosts":
+      ensure => present,
+      owner  => $user,
+      group  => $group,
+      mode   => '0600',
+    }
   }
 
   # Run 'barman check all' to create Barman backup directories

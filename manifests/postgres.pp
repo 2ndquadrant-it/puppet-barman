@@ -8,6 +8,9 @@
 #
 # [*host_group*] - Tag the different host groups for the backup
 #                  (default value is set from the 'settings' class).
+# [*manage_ssh_host_keys*] - When using autoconfigure, ensure the hosts contain
+#                            each other ssh host key. Must also be set on 'barman'
+#                            class. Defaults to false.
 # [*wal_level*] - Configuration of the 'wal_level' parameter in the
 #                 postgresql.conf file. The default value is 'archive'.
 # [*barman_user*] - Definition of the 'barman' user used in Barman 'conninfo'.
@@ -257,6 +260,7 @@ class barman::postgres (
   $incoming_wals_directory       = undef,
   $last_backup_maximum_age       = $::barman::last_backup_maximum_age,
   $minimum_redundancy            = $::barman::minimum_redundancy,
+  $manage_ssh_host_keys          = $::barman::manage_ssh_host_keys,
   $network_compression           = $::barman::network_compression,
   $parallel_jobs                 = $::barman::parallel_jobs,
   $path_prefix                   = $::barman::path_prefix,
@@ -389,13 +393,16 @@ class barman::postgres (
     }
   }
 
-  @@sshkey { "postgres-${::hostname}":
-    ensure       => present,
-    host_aliases => [$::hostname, $::fqdn, $::ipaddress],
-    key          => $::sshecdsakey,
-    type         => 'ecdsa-sha2-nistp256',
-    target       => "${barman_home}/.ssh/known_hosts",
-    tag          => "barman-${host_group}-postgresql",
+  if $manage_ssh_host_keys {
+    @@sshkey { "postgres-${::hostname}":
+      ensure       => present,
+      host_aliases => [$::hostname, $::fqdn, $::ipaddress],
+      key          => $::sshecdsakey,
+      type         => 'ecdsa-sha2-nistp256',
+      target       => "${barman_home}/.ssh/known_hosts",
+      tag          => "barman-${host_group}-postgresql",
+    }
+    Sshkey <<| tag == "barman-${host_group}" |>>
   }
 
   if $archiver {
