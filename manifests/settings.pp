@@ -61,6 +61,7 @@ class barman::settings (
   $immediate_checkpoint          = false,
   $last_backup_maximum_age       = false,
   $logfile                       = '/var/log/barman/barman.log',
+  $log_level                     = undef,
   $minimum_redundancy            = '0',
   $network_compression           = undef,
   $parallel_jobs                 = undef,

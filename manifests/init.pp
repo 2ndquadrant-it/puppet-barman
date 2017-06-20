@@ -19,6 +19,8 @@
 #            class.
 # [*logfile*] - A different log file. The default is
 #               '/var/log/barman/barman.log'
+# [*log_level*] - Level of logging. The default is INFO
+#                 (DEBUG, INFO, WARNING, ERROR, CRITICAL). Global.
 # [*archiver*] - Whether the log shipping backup mechanism is active or not
 #                (defaults to true)
 # [*archiver_batch_size*] - Setting this option enables batch processing of WAL
@@ -246,6 +248,7 @@ class barman (
   $immediate_checkpoint          = $::barman::settings::immediate_checkpoint,
   $last_backup_maximum_age       = $::barman::settings::last_backup_maximum_age,
   $logfile                       = $::barman::settings::logfile,
+  $log_level                     = $::barman::settings::log_level,
   $manage_package_repo           = $::barman::settings::manage_package_repo,
   $manage_ssh_host_keys          = $::barman::settings::manage_ssh_host_keys,
   $minimum_redundancy            = $::barman::settings::minimum_redundancy,
