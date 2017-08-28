@@ -33,6 +33,9 @@ custom_compression_filter = <%= @custom_compression_filter %>
 <%- if @custom_decompression_filter -%>
 custom_decompression_filter = <%= @custom_decompression_filter %>
 <%- end -%>
+<%- if @log_level -%>
+log_level = <%= @log_level %>
+<%- end -%>
 minimum_redundancy = <%= @minimum_redundancy %>
 <%- if @network_compression -%>
 network_compression = <%= @network_compression %>
