@@ -1,3 +1,19 @@
+## 2018-01-09 - Release 2.1.0
+
+### Summary
+
+- Improved hiera support
+- Added support for `backup_directory`, `log_level` and `parallel_cron_jobs`
+- Added support for SSH host key exchange
+- Updated module dependencies to need newer postgresql and apt modules
+
+#### Bugfixes
+
+- #38, #48 Make pg_hba_rule title server-specific to avoid duplication
+- Added settings that were left behind to the template
+- Only set `archive_command` if archiving is enabled
+- Avoid exchanging ssh authentication keys if the setup is streaming only
+
 ## 2017-03-16 - Release 2.0.2
 
 ### Summary
