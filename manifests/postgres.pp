@@ -322,7 +322,7 @@ class barman::postgres (
   # Export resources to Barman server
   @@barman::server { $postgres_server_id:
     conninfo                      => "user=${barman_dbuser} dbname=${barman_dbname} host=${server_address} port=${server_port}",
-    ssh_command                   => "ssh ${postgres_user}@${server_address}",
+    ssh_command                   => "ssh -q ${postgres_user}@${server_address}",
     tag                           => "barman-${host_group}",
     archiver                      => $archiver,
     archiver_batch_size           => $archiver_batch_size,
