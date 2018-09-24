@@ -47,6 +47,7 @@ class barman::settings (
   $dbuser                        = 'barman',
   $dbname                        = 'postgres',
   $home                          = '/var/lib/barman',
+  $home_mode                     = '0750',
   $archiver                      = true,
   $archiver_batch_size           = undef,
   $backup_method                 = undef,

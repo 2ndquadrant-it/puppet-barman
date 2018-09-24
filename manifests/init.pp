@@ -244,6 +244,7 @@ class barman (
   $custom_decompression_filter   = $::barman::settings::custom_decompression_filter,
   $exported_ipaddress            = "${::ipaddress}/32",
   $home                          = $::barman::settings::home,
+  $home_mode                     = $::barman::settings::home_mode,
   $host_group                    = $::barman::settings::host_group,
   $immediate_checkpoint          = $::barman::settings::immediate_checkpoint,
   $last_backup_maximum_age       = $::barman::settings::last_backup_maximum_age,
@@ -438,7 +439,7 @@ class barman (
     ensure  => $ensure_directory,
     owner   => $user,
     group   => $group,
-    mode    => '0750',
+    mode    => $home_mode,
     require => Package['barman']
   }
 
