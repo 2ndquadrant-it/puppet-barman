@@ -75,4 +75,29 @@ describe 'barman::server', :type => :define do
     }
   end
 
+  context "with valid backup_options => exclusive_backup" do
+    let(:params) { @defaults.merge({ :backup_options => 'exclusive_backup' }) }
+    it { is_expected.to compile }
+  end
+
+  context "with valid backup_options => concurrent_backup" do
+    let(:params) { @defaults.merge({ :backup_options => 'concurrent_backup' }) }
+    it { is_expected.to compile }
+  end
+
+  context "with valid backup_options => exclusive_backup,external_configuration" do
+    let(:params) { @defaults.merge({ :backup_options => 'exclusive_backup,external_configuration' }) }
+    it { is_expected.to compile }
+  end
+
+  context "with valid backup_options => concurrent_backup,external_configuration" do
+    let(:params) { @defaults.merge({ :backup_options => 'concurrent_backup,external_configuration' }) }
+    it { is_expected.to compile }
+  end
+
+  context "with invalid backup_options => external_configuration" do
+    let(:params) { @defaults.merge({ :backup_options => 'external_configuration' }) }
+    it { is_expected.to compile.and_raise_error(/Invalid backup option please use exclusive_backup or concurrent_backup with optional external_configuration/) }
+  end
+
 end
