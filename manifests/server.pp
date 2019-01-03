@@ -29,7 +29,8 @@
 #                     rsync command. If set to postgres barman will use the
 #                     pg_basebackup command to execute the backup.
 # [*backup_options*] - Behavior for backup operations: possible values are
-#                      exclusive_backup (default) and concurrent_backup.
+#                      exclusive_backup (default) and concurrent_backup with optional
+#                      external_configuration.
 # [*recovery_options*] - The restore command to write in the recovery.conf.
 #                        Possible values are 'get-wal' and undef. Default: undef.
 # [*bandwidth_limit*] - This option allows you to specify a maximum transfer rate
@@ -249,7 +250,7 @@ define barman::server (
   validate_re($ensure, '^(present|absent)$', "${ensure} is not a valid value (ensure = present|absent).")
 
   # check if backup_options has correct values
-  validate_re($backup_options, [ '^exclusive_backup$', '^concurrent_backup$', 'Invalid backup option please use exclusive_backup or concurrent_backup' ])
+  validate_re($backup_options, [ '^(exclusive_backup|concurrent_backup)(,external_configuration)?$', 'Invalid backup option please use exclusive_backup or concurrent_backup with optional external_configuration' ])
 
   if($recovery_options) {
     # Check if recovery has correct values, if specified
