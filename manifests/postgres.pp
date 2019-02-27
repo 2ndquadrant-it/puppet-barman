@@ -299,9 +299,14 @@ class barman::postgres (
     default => $password,
   }
 
+  $archive_mode = $archiver ? {
+    true  => 'on',
+    false => 'off',
+  }
+
   # Configure PostgreSQL server for archive mode
   postgresql::server::config_entry {
-    'archive_mode': value => 'on';
+    'archive_mode': value => $archive_mode;
     'wal_level': value => $wal_level;
   }
 
