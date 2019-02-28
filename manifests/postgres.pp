@@ -301,7 +301,7 @@ class barman::postgres (
 
   $archive_mode = $archiver ? {
     true  => 'on',
-    false => 'off',
+    default => 'off',
   }
 
   # Configure PostgreSQL server for archive mode
