@@ -9,6 +9,10 @@
 #             class.
 # [*ensure*] - Ensure that Barman is installed. The default value is 'present'.
 #              Otherwise it will be set as 'absent'.
+# [*version*] - Specifies the version of barman packages. The default vaule is 'latest'.
+# [*release*] - Optional, specifies the release of barman packages. The default vaule is 'undef'.
+# [*arch*] - Optional, specifies the architecture of barman packages. The default vaule is 'noarch'.
+# [*epoch*] - Optional, specifies the epoch of barman packages. The default vaule is '0'.
 # [*conf_template*] - Path of the template of the barman.conf configuration
 #                     file. The default value does not need to be changed.
 # [*logrotate_template*] - Path of the template of the logrotate.conf file.
@@ -227,6 +231,10 @@ class barman (
   $user                          = $::barman::settings::user,
   $group                         = $::barman::settings::group,
   $ensure                        = 'present',
+  $version                       = 'latest',
+  $release                       = 'undef',
+  $arch                          = 'noarch',
+  $epoch                         = '0',
   $conf_template                 = 'barman/barman.conf.erb',
   $logrotate_template            = 'barman/logrotate.conf.erb',
   $barman_fqdn                   = $::fqdn,
@@ -410,9 +418,32 @@ class barman (
       }
     }
   }
-  package { 'barman':
-    ensure => $ensure,
-    tag    => 'postgresql',
+  if $version == 'latest'{
+    package { 'barman':
+      ensure => $ensure,
+      tag    => 'postgresql',
+    }
+  }else{
+
+    # If no release specified - just use version
+    $install_version = $release ? {'undef' => $version, default => "${version}-${release}" }
+    case $ensure {
+      'present': {$package_ensure = $install_version} # 'latest' or $install_version
+      default:  {$package_ensure = 'absent'}
+    }
+    case $release {
+      # If no release specified for locking - use *
+      'undef': {$lock_version = "${version}-*"}
+      default: {$lock_version = $install_version}
+    }
+    yum::versionlock {"${epoch}:barman-${lock_version}.${arch}":
+      ensure => $ensure,
+      before => Package['barman'],
+    }
+    -> package {'barman':
+      ensure => $package_ensure,
+      tag    => 'postgresql',
+    }
   }
 
   file { '/etc/barman.conf.d':
