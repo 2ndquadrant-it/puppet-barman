@@ -429,18 +429,18 @@ class barman (
     $install_version = $release ? {'undef' => $version, default => "${version}-${release}" }
     case $ensure {
       'present': {$package_ensure = $install_version} # 'latest' or $install_version
-      'absent':  {$package_ensure = 'absent'}
+      default:  {$package_ensure = 'absent'}
     }
     case $release {
-       # If no release specified for locking - use *
+      # If no release specified for locking - use *
       'undef': {$lock_version = "${version}-*"}
       default: {$lock_version = $install_version}
     }
     yum::versionlock {"${epoch}:barman-${lock_version}.${arch}":
       ensure => $ensure,
       before => Package['barman'],
-    } ->
-    package {'barman':
+    }
+    -> package {'barman':
       ensure => $package_ensure,
       tag    => 'postgresql',
     }
