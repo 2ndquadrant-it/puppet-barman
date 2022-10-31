@@ -234,7 +234,7 @@ class barman::postgres (
   $backup_wday                   = undef,
   $backup_hour                   = 4,
   $backup_minute                 = 0,
-  $password                      = '',
+  $password                      = undef,
   $server_address                = $::fqdn,
   $server_port                   = 5432,
   $postgres_server_id            = $::hostname,
